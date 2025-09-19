@@ -1,0 +1,20 @@
+{
+  "projectName": "Unidad Restitución de Tierras",
+  "description": "Frontend Angular para la gestión y visualización de sentencias judiciales, usando PrimeNG y consumo de API REST.",
+  "api": {
+    "domain": "Definido en src/environments/environment.ts como apiDomain. Cambiar aquí para producción o Docker.",
+    "path": "Definido en src/environments/environment.ts como apiPath. Concatenado en apiUrl.",
+    "ejemplo": "http://localhost:3000/api/v1/ia/extracciones-sentencias"
+  },
+  "frontend": {
+    "framework": "Angular 17",
+    "ui": "PrimeNG 17, tema saga-blue, PrimeFlex, PrimeIcons",
+    "tablaPrincipal": "src/app/features/sentencias/components/sentencias-table/sentencias-table.component.*"
+  },
+  "docker-ready": true,
+  "notas": [
+    "Para cambiar solo el dominio de la API, modificar apiDomain en environment.ts o usar variable de entorno NG_APP_API_DOMAIN en Docker.",
+    "Separar lógica de dominio y path permite fácil migración entre entornos.",
+    "Ver comentarios en environment.ts para ejemplos de uso."
+  ]
+}

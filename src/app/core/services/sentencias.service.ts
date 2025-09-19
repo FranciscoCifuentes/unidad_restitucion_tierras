@@ -1,25 +1,24 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Sentencia } from '../models/sentencia';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SentenciasService {
-  private apiUrl = 'http://localhost:3000/api/v1/ia/extracciones-sentencias';
-
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Sentencia[]> {
-    return this.http.get<Sentencia[]>(this.apiUrl);
+  getAll(headers?: HttpHeaders): Observable<Sentencia[]> {
+    return this.http.get<Sentencia[]>(environment.apiUrl, { headers });
   }
 
-  upload(data: FormData): Observable<Sentencia> {
-    return this.http.post<Sentencia>(this.apiUrl, data);
+  upload(data: FormData, headers?: HttpHeaders): Observable<Sentencia> {
+    return this.http.post<Sentencia>(environment.apiUrl, data, { headers });
   }
 
-  delete(radicado: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${radicado}`);
+  delete(radicado: string, headers?: HttpHeaders): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/${radicado}`, { headers });
   }
 }

@@ -1,0 +1,207 @@
+{
+    "uuid": "e667642a-b25d-46ca-b936-df0f9e6b3851",
+    "lastMigration": 33,
+    "name": "Demo API",
+    "endpointPrefix": "",
+    "latency": 0,
+    "port": 3000,
+    "hostname": "",
+    "folders": [],
+    "routes": [
+        {
+            "uuid": "10cc3e1e-3b6f-4bac-ba9b-95378d4ee3c4",
+            "type": "http",
+            "documentation": "Lista de todas las providencias que han sido cargadas para su procesamiento, junto con su estado actual y las acciones permitidas para cada una.",
+            "method": "get",
+            "endpoint": "api/v1/ia/extracciones-sentencias",
+            "responses": [
+                {
+                    "uuid": "8605210c-94fe-456a-ad19-25c2ae86c406",
+                    "body": "[\r\n  {\r\n    \"radicado_providencia\": \"11001310300120240012300\",\r\n    \"fecha_envio\": \"15/08/2025\",\r\n    \"estado\": \"Procesado con éxito\",\r\n    \"tiempo_transcurrido\": \"1 hora 15 minutos\",\r\n    \"acciones\": [\"Descargar\", \"Gestionar\"]\r\n  },\r\n  {\r\n    \"radicado_providencia\": \"76001400300220240045601\",\r\n    \"fecha_envio\": \"14/08/2025\",\r\n    \"estado\": \"Procesado con error\",\r\n    \"tiempo_transcurrido\": \"1 día 4 horas\",\r\n    \"acciones\": [\"Descargar\", \"Ver detalle\", \"Eliminar\"]\r\n  },\r\n  {\r\n    \"radicado_providencia\": \"05001310300320250078900\",\r\n    \"fecha_envio\": \"16/08/2025\",\r\n    \"estado\": \"En procesamiento\",\r\n    \"tiempo_transcurrido\": \"5 minutos\",\r\n    \"acciones\": [\"Descargar\"]\r\n  },\r\n  {\r\n    \"radicado_providencia\": \"13001310300120230032100\",\r\n    \"fecha_envio\": \"12/08/2025\",\r\n    \"estado\": \"En retroalimentación\",\r\n    \"tiempo_transcurrido\": \"4 días 2 horas\",\r\n    \"acciones\": [\"Descargar\", \"Gestionar\"]\r\n  },\r\n  {\r\n    \"radicado_providencia\": \"41001400300220220011101\",\r\n    \"fecha_envio\": \"16/08/2025\",\r\n    \"estado\": \"Recibido\",\r\n    \"tiempo_transcurrido\": \"1 minuto\",\r\n    \"acciones\": [\"Descargar\", \"Eliminar\"]\r\n  },\r\n  {\r\n    \"radicado_providencia\": \"08001310300320210099900\",\r\n    \"fecha_envio\": \"01/07/2025\",\r\n    \"estado\": \"Finalizada y cargada en SRTDAF\",\r\n    \"tiempo_transcurrido\": \"46 días 8 horas\",\r\n    \"acciones\": [\"Descargar\"]\r\n  },\r\n  {\r\n    \"radicado_providencia\": \"50001310300120250001000\",\r\n    \"fecha_envio\": \"16/08/2025\",\r\n    \"estado\": \"No encontrado\",\r\n    \"tiempo_transcurrido\": \"N/A\",\r\n    \"acciones\": [\"Eliminar\"]\r\n  }\r\n]",
+                    "latency": 0,
+                    "statusCode": 200,
+                    "label": "",
+                    "headers": [],
+                    "bodyType": "INLINE",
+                    "filePath": "",
+                    "databucketID": "",
+                    "sendFileAsBody": false,
+                    "rules": [],
+                    "rulesOperator": "OR",
+                    "disableTemplating": false,
+                    "fallbackTo404": false,
+                    "default": true,
+                    "crudKey": "id",
+                    "callbacks": []
+                }
+            ],
+            "responseMode": null,
+            "streamingMode": null,
+            "streamingInterval": 0
+        },
+        {
+            "uuid": "24117f44-1c15-4ccf-99d6-63e9f24c02af",
+            "type": "http",
+            "documentation": " el usuario carga un nuevo archivo de providencia y registra el número de radicado",
+            "method": "post",
+            "endpoint": "api/v1/ia/extracciones-sentencias",
+            "responses": [
+                {
+                    "uuid": "b946faf5-63c3-4097-95c6-b0c7fa7313a8",
+                    "body": "{\r\n  \"radicado_providencia\": \"41001400300220220011101\",\r\n  \"nombre_archivo\": \"Sentencia_T-456-22.pdf\",\r\n  \"fecha_envio\": \"16/08/2025\",\r\n  \"estado\": \"Recibido\",\r\n  \"mensaje\": \"La providencia ha sido recibida y está en cola para ser procesada por la IA.\",\r\n  \"tiempo_transcurrido\": \"0 minutos\",\r\n  \"acciones\": [\"Descargar\", \"Eliminar\"]\r\n}",
+                    "latency": 0,
+                    "statusCode": 201,
+                    "label": "",
+                    "headers": [],
+                    "bodyType": "INLINE",
+                    "filePath": "",
+                    "databucketID": "",
+                    "sendFileAsBody": false,
+                    "rules": [],
+                    "rulesOperator": "OR",
+                    "disableTemplating": false,
+                    "fallbackTo404": false,
+                    "default": true,
+                    "crudKey": "id",
+                    "callbacks": []
+                }
+            ],
+            "responseMode": null,
+            "streamingMode": null,
+            "streamingInterval": 0
+        },
+        {
+            "uuid": "3a143138-0a91-4746-8b1b-ca767439f809",
+            "type": "http",
+            "documentation": "Providencia tiene el estado \"Procesado con error\", el usuario puede hacer clic en \"Ver detalle\". Esta acción llamaría a un endpoint específico para obtener la información del error.",
+            "method": "get",
+            "endpoint": "api/v1/ia/extracciones-sentencias/:radicado_providencia/error",
+            "responses": [
+                {
+                    "uuid": "8c5e4fb3-ba12-4587-bc5b-5b5dd8791072",
+                    "body": "{\r\n  \"radicado_providencia\": \"{{urlParam 'radicado_providencia'}}\",\r\n  \"estado\": \"Procesado con error\",\r\n  \"error_timestamp\": \"2025-08-15T10:30:00Z\",\r\n  \"codigo_error\": \"IA-EXTRACT-002\",\r\n  \"mensaje_error\": \"El documento PDF está protegido con contraseña y no se pudo leer su contenido.\",\r\n  \"sugerencia_solucion\": \"Por favor, cargue una versión del documento sin protección por contraseña y vuelva a ejecutar el proceso.\",\r\n  \"log_tecnico\": \"Exception: org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException: Error: The supplied password does not match either the owner or user password.\"\r\n}",
+                    "latency": 0,
+                    "statusCode": 200,
+                    "label": "",
+                    "headers": [],
+                    "bodyType": "INLINE",
+                    "filePath": "",
+                    "databucketID": "",
+                    "sendFileAsBody": false,
+                    "rules": [],
+                    "rulesOperator": "OR",
+                    "disableTemplating": false,
+                    "fallbackTo404": false,
+                    "default": true,
+                    "crudKey": "id",
+                    "callbacks": []
+                }
+            ],
+            "responseMode": null,
+            "streamingMode": null,
+            "streamingInterval": 0
+        },
+        {
+            "uuid": "ed1a4e3b-cd19-4caf-ab2b-9990acf7b2c9",
+            "type": "http",
+            "documentation": "Eliminar estaría disponible para ciertos estados. Al invocarla, se enviaría una petición a este endpoint",
+            "method": "delete",
+            "endpoint": "api/v1/ia/extracciones-sentencias/:radicado_providencia",
+            "responses": [
+                {
+                    "uuid": "8bcff1b4-db48-4102-8d3f-f565c04e04c9",
+                    "body": "{\r\n  \"radicado_providencia\": \"{{urlParam 'radicado_providencia'}}\",\r\n  \"mensaje\": \"El registro de la providencia y su archivo asociado han sido eliminados exitosamente.\"\r\n}",
+                    "latency": 0,
+                    "statusCode": 200,
+                    "label": "",
+                    "headers": [],
+                    "bodyType": "INLINE",
+                    "filePath": "",
+                    "databucketID": "",
+                    "sendFileAsBody": false,
+                    "rules": [],
+                    "rulesOperator": "OR",
+                    "disableTemplating": false,
+                    "fallbackTo404": false,
+                    "default": true,
+                    "crudKey": "id",
+                    "callbacks": []
+                }
+            ],
+            "responseMode": null,
+            "streamingMode": null,
+            "streamingInterval": 0
+        }
+    ],
+    "rootChildren": [
+        {
+            "type": "route",
+            "uuid": "10cc3e1e-3b6f-4bac-ba9b-95378d4ee3c4"
+        },
+        {
+            "type": "route",
+            "uuid": "24117f44-1c15-4ccf-99d6-63e9f24c02af"
+        },
+        {
+            "type": "route",
+            "uuid": "3a143138-0a91-4746-8b1b-ca767439f809"
+        },
+        {
+            "type": "route",
+            "uuid": "ed1a4e3b-cd19-4caf-ab2b-9990acf7b2c9"
+        }
+    ],
+    "proxyMode": false,
+    "proxyHost": "",
+    "proxyRemovePrefix": false,
+    "tlsOptions": {
+        "enabled": false,
+        "type": "CERT",
+        "pfxPath": "",
+        "certPath": "",
+        "keyPath": "",
+        "caPath": "",
+        "passphrase": ""
+    },
+    "cors": true,
+    "headers": [
+        {
+            "key": "Content-Type",
+            "value": "application/json"
+        },
+        {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+        },
+        {
+            "key": "Access-Control-Allow-Methods",
+            "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+        },
+        {
+            "key": "Access-Control-Allow-Headers",
+            "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+        }
+    ],
+    "proxyReqHeaders": [
+        {
+            "key": "",
+            "value": ""
+        }
+    ],
+    "proxyResHeaders": [
+        {
+            "key": "",
+            "value": ""
+        }
+    ],
+    "data": [
+        {
+            "uuid": "5216d063-9f4b-44a4-b54a-f068feddc381",
+            "id": "5ugo",
+            "name": "Users",
+            "documentation": "",
+            "value": "[\n  {{#repeat 50}}\n  {\n    \"id\": \"{{faker 'string.uuid'}}\",\n    \"username\": \"{{faker 'internet.userName'}}\"\n  }\n  {{/repeat}}\n]"
+        }
+    ],
+    "callbacks": []
+}

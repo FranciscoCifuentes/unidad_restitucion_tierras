@@ -6,7 +6,7 @@
     dataKey="radicado_providencia"
     [rows]="10"
     [paginator]="true"
-
+    [loading]="loading"
     [rowHover]="true"
     [globalFilterFields]="['radicado_providencia','fecha_envio','estado','tiempo_transcurrido']"
     responsiveLayout="scroll"
@@ -66,7 +66,12 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="5">No se encontraron sentencias.</td>
+        <td colspan="5">
+          <ng-container *ngIf="!error; else errorTpl">No se encontraron sentencias.</ng-container>
+          <ng-template #errorTpl>
+            <span class="text-red-500">{{ error }}</span>
+          </ng-template>
+        </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="loadingbody">
