@@ -1,66 +1,49 @@
-import {
-  AngularNodeAppEngine,
-  createNodeRequestHandler,
-  isMainModule,
-  writeResponseToNodeResponse,
-} from '@angular/ssr/node';
-import express from 'express';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-const browserDistFolder = resolve(serverDistFolder, '../browser');
+import 'zone.js/node';
+// import { ngExpressEngine } from '@nguniversal/express-engine';
+import express, { Request, Response } from 'express';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
-const app = express();
-const angularApp = new AngularNodeAppEngine();
+// The Express app is exported so that it can be used by serverless Functions.
+export function app(): express.Express {
+  const server = express();
+  const distFolder = join(process.cwd(), 'dist/unidad_restitucion_tierras/browser');
+  const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index.html';
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
 
-/**
- * Serve static files from /browser
- */
-app.use(
-  express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: false,
-    redirect: false,
-  }),
-);
+  // SSR deshabilitado: solo servir archivos estáticos
 
-/**
- * Handle all other requests by rendering the Angular application.
- */
-app.use('/**', (req, res, next) => {
-  angularApp
-    .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
-    .catch(next);
-});
+  // Example Express Rest API endpoints
+  // server.get('/api/**', (req, res) => { });
 
-/**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
-if (isMainModule(import.meta.url)) {
+  // Serve static files from /browser
+  server.get('*.*', express.static(distFolder, {
+    maxAge: '1y'
+  }));
+
+  // All regular routes use the Universal engine
+  server.get('*', (req: Request, res: Response) => {
+    res.render(indexHtml, { req });
+  });
+
+  return server;
+}
+
+function run(): void {
   const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
+  const server = app();
+  server.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }
 
-/**
- * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
- */
-export const reqHandler = createNodeRequestHandler(app);
+// Webpack will replace 'require' with '__webpack_require__'
+// '__non_webpack_require__' is a proxy to Node 'require'
+// The below code is to ensure that the server is run only when not requiring the bundle.
+declare const __non_webpack_require__: NodeRequire;
+const mainModule = typeof __non_webpack_require__ !== 'undefined' ? __non_webpack_require__.main : require.main;
+const moduleFilename = mainModule && mainModule.filename || '';
+if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
+  run();
+}
