@@ -62,7 +62,18 @@ export class SentenciasTableComponent implements OnInit {
   }
 
   onDelete(sentencia: Sentencia): void {
-    console.log('Eliminar', sentencia);
+    if (!confirm('¿Está seguro de eliminar la providencia ' + sentencia.radicado_providencia + '?')) {
+      return;
+    }
+    this.sentenciasService.delete(sentencia.radicado_providencia).subscribe({
+      next: () => {
+        this.sentencias = this.sentencias.filter(s => s.radicado_providencia !== sentencia.radicado_providencia);
+        alert('El registro de la providencia y su archivo asociado han sido eliminados exitosamente.');
+      },
+      error: (err) => {
+        alert('Error al eliminar la providencia: ' + (err?.error?.mensaje || 'Error desconocido'));
+      }
+    });
   }
 
   onDownload(sentencia: Sentencia): void {
