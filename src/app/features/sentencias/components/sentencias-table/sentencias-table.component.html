@@ -1,5 +1,37 @@
 <div class="card">
-  <div class="font-semibold text-xl mb-4">Sentencias</div>
+  <div class="font-semibold text-xl mb-4">Extracción de Sentencia</div>
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  <form [formGroup]="form" class="sentencia-form" autocomplete="off" (submit)="$event.preventDefault()">
+    <div class="sentencia-form-row">
+      <div class="sentencia-form-group">
+        <label for="radicadoInput">Radicado de la providencia</label>
+        <input id="radicadoInput" type="text" class="sentencia-input" placeholder="Ingrese el número de radicado de la providencia" formControlName="radicado" (input)="onRadicadoChange($event)" />
+        <div *ngIf="form.get('radicado')?.invalid && (form.get('radicado')?.touched || form.get('radicado')?.dirty)" class="sentencia-mensaje sentencia-mensaje-error">
+          El radicado es obligatorio.
+        </div>
+      </div>
+      <div class="sentencia-form-group">
+        <label for="fileInput">Cargar sentencia</label>
+        <input id="fileInput" type="file" class="sentencia-input-file" (change)="onFileChange($event)" />
+        <div *ngIf="form.get('archivo')?.invalid && (form.get('archivo')?.touched || form.get('archivo')?.dirty)" class="sentencia-mensaje sentencia-mensaje-error">
+          Debe seleccionar un archivo.
+        </div>
+      </div>
+      <div class="sentencia-form-group sentencia-form-btn">
+  <button type="button" class="sentencia-btn-agregar" [disabled]="agregando || form.invalid" (click)="onAgregar()" aria-label="Agregar sentencia">Agregar</button>
+      </div>
+    </div>
+    <div *ngIf="mensajeAgregar"
+         class="sentencia-mensaje"
+         [ngClass]="{
+           'sentencia-mensaje-error': mensajeAgregar === 'Debe ingresar el radicado y seleccionar un archivo.' || mensajeAgregar.startsWith('Error'),
+           'sentencia-mensaje-exito': mensajeAgregar === 'Sentencia agregada correctamente.'
+         }"
+    >
+      {{ mensajeAgregar }}
+    </div>
+  </form>
   <p-table
     #dt
     [value]="sentencias"
@@ -11,17 +43,6 @@
     [globalFilterFields]="['radicado_providencia','fecha_envio','estado','tiempo_transcurrido']"
     responsiveLayout="scroll"
   >
-    <ng-template pTemplate="caption">
-      <div class="flex justify-between items-center flex-column sm:flex-row">
-        <button pButton label="Limpiar" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="dt.clear()"></button>
-        <span class="ml-auto">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')" placeholder="Buscar..." />
-          </span>
-        </span>
-      </div>
-    </ng-template>
     <ng-template pTemplate="header">
       <tr>
         <th style="min-width: 14rem" pSortableColumn="radicado_providencia">
@@ -31,22 +52,13 @@
           </div>
         </th>
         <th style="min-width: 12rem" pSortableColumn="fecha_envio">
-          <div class="flex justify-between items-center">
-            Fecha de envío
-            <p-columnFilter type="date" field="fecha_envio" display="menu" placeholder="dd/mm/yyyy"></p-columnFilter>
-          </div>
+          Fecha de envío
         </th>
         <th style="min-width: 10rem" pSortableColumn="estado">
-          <div class="flex justify-between items-center">
-            Estado
-            <p-columnFilter type="text" field="estado" display="menu" placeholder="Buscar por estado"></p-columnFilter>
-          </div>
+          Estado
         </th>
         <th style="min-width: 14rem" pSortableColumn="tiempo_transcurrido">
-          <div class="flex justify-between items-center">
-            Tiempo transcurrido
-            <p-columnFilter type="text" field="tiempo_transcurrido" display="menu" placeholder="Buscar por tiempo"></p-columnFilter>
-          </div>
+          Tiempo transcurrido
         </th>
         <th style="min-width: 10rem">Acciones</th>
       </tr>
@@ -55,13 +67,20 @@
       <tr>
         <td>{{ sentencia.radicado_providencia }}</td>
         <td>{{ sentencia.fecha_envio | date:'dd/MM/yyyy' }}</td>
-        <td>{{ sentencia.estado }}</td>
+        <td>
+          <span
+            class="badge"
+            [ngClass]="sentencia.estado | badgeEstado"
+          >
+            {{ sentencia.estado }}
+          </span>
+        </td>
         <td>{{ sentencia.tiempo_transcurrido }}</td>
         <td>
-          <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)"></button>
-          <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download" class="p-button-success p-button-sm mr-1" (click)="onDownload(sentencia)"></button>
-          <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog" class="p-button-warning p-button-sm mr-1" (click)="onManage(sentencia)"></button>
-          <button *ngIf="sentencia.acciones.includes('Ver detalle')" pButton type="button" icon="pi pi-exclamation-triangle" class="p-button-info p-button-sm" (click)="onVerDetalle(sentencia)"></button>
+          <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)" [attr.aria-label]="'Eliminar sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download" class="p-button-success p-button-sm mr-1" (click)="onDownload(sentencia)" [attr.aria-label]="'Descargar sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog" class="p-button-warning p-button-sm mr-1" (click)="onManage(sentencia)" [attr.aria-label]="'Gestionar sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Ver detalle')" pButton type="button" icon="pi pi-exclamation-triangle" class="p-button-info p-button-sm" (click)="onVerDetalle(sentencia)" [attr.aria-label]="'Ver detalle de error de sentencia ' + sentencia.radicado_providencia"></button>
         </td>
       </tr>
     </ng-template>
