@@ -59,8 +59,9 @@
         <td>{{ sentencia.tiempo_transcurrido }}</td>
         <td>
           <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)"></button>
-          <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download" class="p-button-info p-button-sm mr-1" (click)="onDownload(sentencia)"></button>
-          <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog" class="p-button-warning p-button-sm" (click)="onManage(sentencia)"></button>
+          <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download" class="p-button-success p-button-sm mr-1" (click)="onDownload(sentencia)"></button>
+          <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog" class="p-button-warning p-button-sm mr-1" (click)="onManage(sentencia)"></button>
+          <button *ngIf="sentencia.acciones.includes('Ver detalle')" pButton type="button" icon="pi pi-exclamation-triangle" class="p-button-info p-button-sm" (click)="onVerDetalle(sentencia)"></button>
         </td>
       </tr>
     </ng-template>
@@ -81,3 +82,44 @@
     </ng-template>
   </p-table>
 </div>
+
+<p-dialog header="Detalle del error" [(visible)]="displayDetalleError" [modal]="true" [style]="{width: '60vw'}" [baseZIndex]="10000" *ngIf="detalleError">
+  <ng-container *ngIf="detalleError; else cargandoDetalle">
+    <div class="p-fluid">
+      <div class="p-field">
+        <label>Radicado:</label>
+        <span>{{ detalleError.radicado_providencia }}</span>
+      </div>
+      <div class="p-field">
+        <label>Estado:</label>
+        <span>{{ detalleError.estado }}</span>
+      </div>
+      <div class="p-field">
+        <label>Fecha del error:</label>
+        <span>{{ detalleError.error_timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <div class="p-field">
+        <label>Código de error:</label>
+        <span>{{ detalleError.codigo_error }}</span>
+      </div>
+      <div class="p-field">
+        <label>Mensaje:</label>
+        <span>{{ detalleError.mensaje_error }}</span>
+      </div>
+      <div class="p-field">
+        <label>Sugerencia:</label>
+        <span>{{ detalleError.sugerencia_solucion }}</span>
+      </div>
+      <div class="p-field">
+        <label>Log técnico:</label>
+        <pre style="white-space: pre-wrap;">{{ detalleError.log_tecnico }}</pre>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #cargandoDetalle>
+    <div class="p-text-center">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2em"></i>
+      <p>Cargando detalle...</p>
+    </div>
+  </ng-template>
+</p-dialog>

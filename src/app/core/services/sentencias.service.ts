@@ -21,4 +21,8 @@ export class SentenciasService {
   delete(radicado: string, headers?: HttpHeaders): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/${radicado}`, { headers });
   }
+
+  getDetalleError(radicado: string, headers?: HttpHeaders) {
+    return this.http.get<any>(`${environment.apiUrl}/${radicado}/error`, { headers });
+  }
 }

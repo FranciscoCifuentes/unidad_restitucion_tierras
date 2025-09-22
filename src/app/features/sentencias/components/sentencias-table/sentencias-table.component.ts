@@ -20,6 +20,24 @@ export interface Sentencia {
   styleUrl: './sentencias-table.component.css'
 })
 export class SentenciasTableComponent implements OnInit {
+  displayDetalleError = false;
+  detalleError: any = null;
+
+  onVerDetalle(sentencia: Sentencia): void {
+    this.detalleError = null;
+    this.displayDetalleError = true;
+    const radicado = sentencia.radicado_providencia;
+    this.sentenciasService.getDetalleError(radicado).subscribe({
+      next: (data: any) => {
+        this.detalleError = data;
+      },
+      error: (err: any) => {
+        this.detalleError = {
+          mensaje_error: 'No se pudo obtener el detalle del error.'
+        };
+      }
+    });
+  }
   sentencias: Sentencia[] = [];
   loading = false;
   error: string | null = null;
