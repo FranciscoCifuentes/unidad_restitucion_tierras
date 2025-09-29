@@ -1,9 +1,13 @@
-import { Routes } from '@angular/router';
-import { SentenciasTableComponent } from './features/sentencias/components/sentencias-table/sentencias-table.component';
 
+import { Routes } from '@angular/router';
+
+/**
+ * Configuración de rutas principal de la aplicación.
+ * SRP: Solo gestiona el lazy loading de features.
+ */
 export const routes: Routes = [
   {
     path: '',
-    component: SentenciasTableComponent
+    loadChildren: () => import('./features/sentencias/sentencias.module').then(m => m.SentenciasModule)
   }
 ];

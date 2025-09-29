@@ -1,22 +1,10 @@
-// Métodos requeridos por la plantilla para evitar errores de compilación
+// Imports únicos y declaración de clase única
 import { Table } from 'primeng/table';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SentenciasService } from '../../../../core/services/sentencias.service';
-import { SentenciaApiResponse, DetalleErrorResponse } from '../../../../core/models/sentencia-api';
-import { CommonModule } from '@angular/common';
+import { Sentencia, SentenciaApiResponse, DetalleErrorResponse } from '../../../../core/models/sentencia-api';
 import { MessageService, ConfirmationService } from 'primeng/api';
-
-export interface Sentencia {
-  radicado_providencia: string;
-  fecha_envio: Date | string;
-  estado: string;
-  tiempo_transcurrido: string;
-  acciones: string[];
-}
 
 @Component({
   selector: 'app-sentencias-table',
@@ -33,6 +21,32 @@ export class SentenciasTableComponent implements OnInit {
   sentencias: Sentencia[] = [];
   loading = false;
   error: string | null = null;
+  radicadoError: string | null = null;
+  archivoError: string | null = null;
+
+  // Mensajes y acciones centralizados
+  private static readonly ERROR_MSG = {
+    campoObligatorio: 'Este campo es obligatorio.',
+    radicadoLongitud: 'El radicado debe tener exactamente 23 dígitos.',
+    archivoObligatorio: 'Debe seleccionar un archivo PDF.',
+    archivoTipo: 'Solo se permiten archivos con extensión .PDF.',
+    agregarError: 'Corrige los errores antes de continuar.',
+    agregarSentencia: 'Sentencia agregada correctamente.',
+    agregarErrorGeneral: 'Error al agregar la sentencia.'
+  };
+  public static readonly ACCIONES = {
+    eliminar: 'Eliminar',
+    gestionar: 'Gestionar',
+    verDetalle: 'Ver detalle',
+    descargar: 'Descargar'
+  };
+
+  /**
+   * Convierte un string 'DD/MM/YYYY HH:mm' o 'DD/MM/YYYY' a Date para el pipe date.
+   */
+  public parseFecha(fecha: string | Date): Date {
+    return parseFechaDDMMYYYY(fecha);
+  }
 
   constructor(
     private sentenciasService: SentenciasService,
@@ -45,6 +59,7 @@ export class SentenciasTableComponent implements OnInit {
       archivo: [null, Validators.required]
     });
   }
+  // (Ya existen estas propiedades, constantes y constructor arriba, así que se eliminan los duplicados)
 
   onVerDetalle(sentencia: Sentencia): void {
     this.detalleError = null;
@@ -69,48 +84,68 @@ export class SentenciasTableComponent implements OnInit {
   }
 
   onRadicadoChange(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
+    const value = (event.target as HTMLInputElement).value.replace(/[^0-9]/g, '');
     this.form.get('radicado')?.setValue(value);
     this.form.get('radicado')?.markAsDirty();
+    this.radicadoError = this.validarRadicado(value);
   }
 
+  private validarRadicado(value: string): string | null {
+    if (!value) return SentenciasTableComponent.ERROR_MSG.campoObligatorio;
+    if (value.length !== 23) return SentenciasTableComponent.ERROR_MSG.radicadoLongitud;
+    return null;
+  }
   onFileChange(event: Event) {
     const files = (event.target as HTMLInputElement).files;
     this.fileInput = files && files.length > 0 ? files[0] : null;
     this.form.get('archivo')?.setValue(this.fileInput);
     this.form.get('archivo')?.markAsDirty();
+    this.archivoError = this.validarArchivo(this.fileInput);
+    if (this.archivoError) {
+      this.form.get('archivo')?.setValue(null);
+    }
   }
 
+  private validarArchivo(file: File | null): string | null {
+    if (!file) return SentenciasTableComponent.ERROR_MSG.archivoObligatorio;
+    if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) return SentenciasTableComponent.ERROR_MSG.archivoTipo;
+    return null;
+  }
   onAgregar() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      this.mensajeAgregar = 'Debe ingresar el radicado y seleccionar un archivo.';
+    const radicado = this.form.get('radicado')?.value;
+    const archivo = this.form.get('archivo')?.value;
+    this.radicadoError = this.validarRadicado(radicado);
+    this.archivoError = this.validarArchivo(archivo);
+    if (this.radicadoError || this.archivoError) {
+      this.mensajeAgregar = SentenciasTableComponent.ERROR_MSG.agregarError;
       return;
     }
     this.agregando = true;
     this.mensajeAgregar = null;
     const formData = new FormData();
-    formData.append('radicado_providencia', this.form.get('radicado')?.value);
-    formData.append('archivo', this.form.get('archivo')?.value);
+    formData.append('radicado_providencia', radicado);
+    formData.append('archivo', archivo);
     this.sentenciasService.upload(formData).subscribe({
       next: (sentencia: SentenciaApiResponse) => {
         this.sentencias.unshift({
           ...sentencia,
-          fecha_envio: parseFechaDDMMYYYY(sentencia.fecha_envio)
+          fecha_envio: sentencia.fecha_envio
         });
         this.form.reset();
         this.fileInput = null;
         const fileInputElem = document.getElementById('fileInput') as HTMLInputElement;
         if (fileInputElem) fileInputElem.value = '';
-        this.mensajeAgregar = 'Sentencia agregada correctamente.';
+        this.mensajeAgregar = SentenciasTableComponent.ERROR_MSG.agregarSentencia;
+        this.radicadoError = null;
+        this.archivoError = null;
         if (sentencia.mensaje) {
           this.messageService.add({severity: 'success', summary: 'Información', detail: sentencia.mensaje, life: 5000});
         }
         this.agregando = false;
       },
       error: () => {
-        this.mensajeAgregar = 'Error al agregar la sentencia.';
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al agregar la sentencia.', life: 5000});
+        this.mensajeAgregar = SentenciasTableComponent.ERROR_MSG.agregarErrorGeneral;
+        this.messageService.add({severity: 'error', summary: 'Error', detail: SentenciasTableComponent.ERROR_MSG.agregarErrorGeneral, life: 5000});
         this.agregando = false;
       }
     });
@@ -121,10 +156,16 @@ export class SentenciasTableComponent implements OnInit {
     this.loading = true;
     this.sentenciasService.getAll().subscribe({
       next: (data: SentenciaApiResponse[]) => {
-        this.sentencias = data.map((s: SentenciaApiResponse) => ({
-          ...s,
-          fecha_envio: parseFechaDDMMYYYY(s.fecha_envio)
-        }));
+        this.sentencias = data.map((s: SentenciaApiResponse) => {
+          const fechaEnvio = typeof s.fecha_envio === 'string' ? s.fecha_envio : String(s.fecha_envio);
+          const acciones = calcularAcciones(s.estado);
+          return {
+            ...s,
+            fecha_envio: fechaEnvio,
+            tiempo_transcurrido: calcularTiempoTranscurrido(parseFechaDDMMYYYY(fechaEnvio)),
+            acciones
+          };
+        });
         this.loading = false;
       },
       error: (_err: unknown) => {
@@ -176,10 +217,53 @@ export class SentenciasTableComponent implements OnInit {
   }
 }
 
-function parseFechaDDMMYYYY(fecha: string | Date): Date | string {
-  if (typeof fecha === 'string' && fecha.includes('/')) {
-    const [dia, mes, anio] = fecha.split('/').map(Number);
-    return new Date(anio, mes - 1, dia);
+function parseFechaDDMMYYYY(fecha: string | Date): Date {
+  if (typeof fecha === 'string' && fecha) {
+    // Soporta formato 'DD/MM/YYYY HH:mm'
+    const match = fecha.match(/^(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})?$/);
+    if (match) {
+      const [, dia, mes, anio, hora, minuto] = match;
+      return new Date(
+        Number(anio),
+        Number(mes) - 1,
+        Number(dia),
+        Number(hora),
+        Number(minuto)
+      );
+    }
+    // Si solo viene 'DD/MM/YYYY'
+    const matchSimple = fecha.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (matchSimple) {
+      const [, dia, mes, anio] = matchSimple;
+      return new Date(Number(anio), Number(mes) - 1, Number(dia));
+    }
+    // Si viene en formato ISO
+    return new Date(fecha);
   }
-  return fecha;
+  return fecha as Date;
+}
+
+function calcularTiempoTranscurrido(fechaEnvio: Date): string {
+  const ahora = new Date();
+  const diffMs = ahora.getTime() - fechaEnvio.getTime();
+  if (diffMs < 0) return '0 días';
+  const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffHoras = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  return `${diffDias} días ${diffHoras} h`;
+}
+
+function calcularAcciones(estado: string): string[] {
+  const ACCIONES = SentenciasTableComponent.ACCIONES;
+  const acciones: string[] = [];
+  if (["No encontrado", "Recibido", "Procesado con error"].includes(estado)) {
+    acciones.push(ACCIONES.eliminar);
+  }
+  if (["Procesado con éxito", "En retroalimentación"].includes(estado)) {
+    acciones.push(ACCIONES.gestionar);
+  }
+  if (estado === "Procesado con error") {
+    acciones.push(ACCIONES.verDetalle);
+  }
+  acciones.push(ACCIONES.descargar);
+  return acciones;
 }

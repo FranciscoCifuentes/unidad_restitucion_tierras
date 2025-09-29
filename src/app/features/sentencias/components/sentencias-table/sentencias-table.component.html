@@ -6,16 +6,18 @@
     <div class="sentencia-form-row">
       <div class="sentencia-form-group">
         <label for="radicadoInput">Radicado de la providencia</label>
-        <input id="radicadoInput" type="text" class="sentencia-input" placeholder="Ingrese el número de radicado de la providencia" formControlName="radicado" (input)="onRadicadoChange($event)" />
-        <div *ngIf="form.get('radicado')?.invalid && (form.get('radicado')?.touched || form.get('radicado')?.dirty)" class="sentencia-mensaje sentencia-mensaje-error">
-          El radicado es obligatorio.
+        <input id="radicadoInput" type="text" class="sentencia-input" placeholder="Ingrese el número de radicado de la providencia" formControlName="radicado" (input)="onRadicadoChange($event)" [ngClass]="{'input-error': radicadoError}" maxlength="23" autocomplete="off" inputmode="numeric" pattern="[0-9]*" />
+        <div *ngIf="radicadoError" class="sentencia-mensaje sentencia-mensaje-error">
+          <span class="sentencia-error-icon">&#33;</span>
+          <span>{{ radicadoError }}</span>
         </div>
       </div>
       <div class="sentencia-form-group">
         <label for="fileInput">Cargar sentencia</label>
-        <input id="fileInput" type="file" class="sentencia-input-file" (change)="onFileChange($event)" />
-        <div *ngIf="form.get('archivo')?.invalid && (form.get('archivo')?.touched || form.get('archivo')?.dirty)" class="sentencia-mensaje sentencia-mensaje-error">
-          Debe seleccionar un archivo.
+        <input id="fileInput" type="file" class="sentencia-input-file" (change)="onFileChange($event)" accept="application/pdf" />
+        <div *ngIf="archivoError" class="sentencia-mensaje sentencia-mensaje-error">
+          <span class="sentencia-error-icon">&#33;</span>
+          <span>{{ archivoError }}</span>
         </div>
       </div>
       <div class="sentencia-form-group sentencia-form-btn">
@@ -36,8 +38,12 @@
     #dt
     [value]="sentencias"
     dataKey="radicado_providencia"
-    [rows]="10"
+    [rows]="7"
     [paginator]="true"
+    [scrollable]="true"
+    [scrollHeight]="'calc(-360px + 100vh)'"
+    styleClass="mt-4"
+    class="mt-4 p-component p-datatable p-datatable-scrollable"
     [loading]="loading"
     [rowHover]="true"
     [globalFilterFields]="['radicado_providencia','fecha_envio','estado','tiempo_transcurrido']"
@@ -47,14 +53,14 @@
       <tr>
         <th style="min-width: 14rem" pSortableColumn="radicado_providencia">
           <div class="flex justify-between items-center">
-            Radicado de la providencia
             <p-columnFilter type="text" field="radicado_providencia" display="menu" placeholder="Buscar por radicado"></p-columnFilter>
+            Radicado de la providencia
           </div>
         </th>
         <th style="min-width: 12rem" pSortableColumn="fecha_envio">
           Fecha de envío
         </th>
-        <th style="min-width: 10rem" pSortableColumn="estado">
+        <th style="width: 250px; min-width: 250px;" pSortableColumn="estado">
           Estado
         </th>
         <th style="min-width: 14rem" pSortableColumn="tiempo_transcurrido">
@@ -62,23 +68,21 @@
         </th>
         <th style="min-width: 10rem">Acciones</th>
       </tr>
+    <!-- ...existing header code... -->
     </ng-template>
     <ng-template pTemplate="body" let-sentencia>
       <tr>
         <td>{{ sentencia.radicado_providencia }}</td>
-        <td>{{ sentencia.fecha_envio | date:'dd/MM/yyyy' }}</td>
+        <td>{{ parseFecha(sentencia.fecha_envio) | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>
-          <span
-            class="badge"
-            [ngClass]="sentencia.estado | badgeEstado"
-          >
+          <span class="badge" [ngClass]="sentencia.estado | badgeEstado">
             {{ sentencia.estado }}
           </span>
         </td>
         <td>{{ sentencia.tiempo_transcurrido }}</td>
         <td>
-          <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)" [attr.aria-label]="'Eliminar sentencia ' + sentencia.radicado_providencia"></button>
           <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download" class="p-button-success p-button-sm mr-1" (click)="onDownload(sentencia)" [attr.aria-label]="'Descargar sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)" [attr.aria-label]="'Eliminar sentencia ' + sentencia.radicado_providencia"></button>
           <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog" class="p-button-warning p-button-sm mr-1" (click)="onManage(sentencia)" [attr.aria-label]="'Gestionar sentencia ' + sentencia.radicado_providencia"></button>
           <button *ngIf="sentencia.acciones.includes('Ver detalle')" pButton type="button" icon="pi pi-exclamation-triangle" class="p-button-info p-button-sm" (click)="onVerDetalle(sentencia)" [attr.aria-label]="'Ver detalle de error de sentencia ' + sentencia.radicado_providencia"></button>
         </td>
@@ -106,31 +110,31 @@
   <ng-container *ngIf="detalleError; else cargandoDetalle">
     <div class="p-fluid">
       <div class="p-field">
-        <label>Radicado:</label>
+        <label>Radicado: </label>
         <span>{{ detalleError.radicado_providencia }}</span>
       </div>
       <div class="p-field">
-        <label>Estado:</label>
+        <label>Estado: </label>
         <span>{{ detalleError.estado }}</span>
       </div>
       <div class="p-field">
-        <label>Fecha del error:</label>
-        <span>{{ detalleError.error_timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+        <label>Fecha del error: </label>
+  <span>{{ parseFecha(detalleError.error_timestamp) | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
       <div class="p-field">
-        <label>Código de error:</label>
+        <label>Código de error: </label>
         <span>{{ detalleError.codigo_error }}</span>
       </div>
       <div class="p-field">
-        <label>Mensaje:</label>
+        <label>Mensaje: </label>
         <span>{{ detalleError.mensaje_error }}</span>
       </div>
       <div class="p-field">
-        <label>Sugerencia:</label>
+        <label>Sugerencia: </label>
         <span>{{ detalleError.sugerencia_solucion }}</span>
       </div>
       <div class="p-field">
-        <label>Log técnico:</label>
+        <label>Log técnico: </label>
         <pre style="white-space: pre-wrap;">{{ detalleError.log_tecnico }}</pre>
       </div>
     </div>

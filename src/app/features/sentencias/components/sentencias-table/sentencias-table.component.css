@@ -1,3 +1,44 @@
+/* Tabla de sentencias con tamaño fijo y scroll */
+.sentencia-table-scroll {
+	height: 50vh;
+	min-height: 320px;
+	max-height: 70vh;
+	overflow-y: auto;
+	display: block;
+}
+/* Scroll solo en el cuerpo de la tabla, encabezado y paginador fijos */
+
+:host {
+	display: block;
+	margin: 32px;
+}
+
+.input-error {
+	border: 2px solid #e53935 !important;
+	color: #1a237e;
+}
+
+.sentencia-mensaje-error {
+	display: flex;
+	align-items: center;
+	color: #e53935;
+	font-size: 1.1rem;
+	margin-top: 0.5rem;
+}
+.sentencia-error-icon {
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	width: 1.5em;
+	height: 1.5em;
+	border: 2px solid #e53935;
+	border-radius: 50%;
+	font-weight: bold;
+	font-size: 1.2em;
+	margin-right: 0.5em;
+	color: #e53935;
+	background: #fff;
+}
 .custom-confirm-no {
 	border: 2px solid #e5e7eb !important;
 	background: #fff !important;
@@ -114,8 +155,8 @@
 	color: #065f46;
 }
 .badge-error {
-	background: #f59e42;
-	color: #b45309;
+	background: #ffe890;
+	color: #8f6b00;
 }
 .badge-retro {
 	background: #a78bfa;
@@ -151,8 +192,8 @@
 	color: #059669;
 }
 .badge-error {
-	background: #fef3e2;
-	color: #d97706;
+	background: #ffe890;
+	color: #8f6b00;
 }
 .badge-retro {
 	background: #f3f0fd;
