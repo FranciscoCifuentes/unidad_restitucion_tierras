@@ -9,7 +9,7 @@ import { SentenciasTableComponent } from './components/sentencias-table/sentenci
  */
 const routes: Routes = [
   {
-    path: '',
+    path: 'listado',
     component: SentenciasTableComponent
   }
 ];

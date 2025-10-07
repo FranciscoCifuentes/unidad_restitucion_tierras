@@ -11,11 +11,17 @@ import { Router } from '@angular/router';
   styleUrls: ['./menubar.component.css']
 })
 export class MenubarComponent {
+
   public static readonly MENU_ITEMS = [
     {
       label: 'Sentencia',
       icon: 'pi pi-file',
-      route: ['/']
+  route: ['/sentencias/listado']
+    },
+    {
+      label: 'Asignación de entidades',
+      icon: 'pi pi-users',
+      route: ['/asignacion-entidades']
     }
   ];
 

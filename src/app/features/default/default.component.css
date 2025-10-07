@@ -1,0 +1,14 @@
+.default-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  height: 70vh;
+}
+
+.default-logo {
+  width: 15vw;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
