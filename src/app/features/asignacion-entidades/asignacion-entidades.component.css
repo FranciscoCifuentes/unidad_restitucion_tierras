@@ -1,0 +1,91 @@
+.card {
+	padding: 1rem;
+	background: white;
+	border-radius: 0.5rem;
+}
+.footer-bar {
+	/* Fixed to bottom-right of the viewport */
+	position: fixed;
+	right: 1.5rem;
+	bottom: 1.5rem;
+	display: flex;
+	gap: 0.5rem;
+	z-index: 1000;
+	background: transparent;
+	padding: 0.5rem;
+}
+h2 {
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.chips-list {
+	min-height: 3rem;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.p-autocomplete {
+	width: 100%;
+}
+
+/* Specific width for the 'añadir entidades' autocomplete */
+.ac-add-entidades {
+	width: 280px !important;
+}
+.ac-add-entidades .p-inputtext {
+	width: 100% !important;
+	box-sizing: border-box;
+}
+
+/* Ensure the autocomplete input uses full width inside the table cell */
+.p-autocomplete .p-inputtext {
+	width: 100% !important;
+	box-sizing: border-box;
+	padding: 0.5rem;
+}
+
+/* Make chip labels visible and prevent them from collapsing */
+.chips-list .p-chip {
+	background: #eef6ff;
+	border-radius: 999px;
+	padding: 0.25rem 0.6rem;
+	display: inline-flex;
+	align-items: center;
+	max-width: none;
+}
+
+.chips-list .p-chip .p-chip-text {
+	color: #1f2937; /* dark gray */
+	font-size: 0.875rem;
+	white-space: nowrap;
+	padding-right: 0.4rem;
+}
+
+.chips-list .p-chip .p-chip-icon {
+	margin-left: 0.15rem;
+}
+
+/* Force chip inner layout to ensure the text is visible */
+.chips-list .p-chip .p-chip-text,
+.chips-list .p-chip .p-chip-icon {
+	display: inline-block !important;
+	vertical-align: middle;
+}
+.chips-list .p-chip .p-chip-icon {
+	margin-left: 0.35rem !important;
+}
+
+/* Edit action buttons: slightly smaller and 5px gap */
+.edit-buttons {
+	display: inline-flex;
+	flex-direction: column; /* vertical stack */
+	align-items: flex-end; /* align to the right edge of the cell */
+	gap: 5px; /* exact 5px separation requested */
+}
+.edit-buttons .p-button {
+	/* reduce padding and font-size to make buttons smaller but still tappable */
+	padding: 0.25rem 0.5rem !important;
+	font-size: 0.85rem !important;
+}
