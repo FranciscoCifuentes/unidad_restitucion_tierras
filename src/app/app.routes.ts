@@ -24,6 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/asignacion-entidades/asignacion-entidades.component').then(m => m.AsignacionEntidadesComponent)
   },
   {
+    path: 'vocacion-cumplimineto',
+    loadComponent: () => import('./features/vocacion-cumplimineto/vocacion-cumplimineto.component').then(m => m.VocacionCumpliminetoComponent)
+  },
+  {
     path: '**',
     redirectTo: 'default'
   }

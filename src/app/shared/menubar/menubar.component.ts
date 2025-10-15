@@ -23,6 +23,12 @@ export class MenubarComponent {
       icon: 'pi pi-users',
       route: ['/asignacion-entidades']
     }
+    ,
+    {
+      label: 'Vocación de cumplimiento',
+      icon: 'pi pi-briefcase',
+      route: ['/vocacion-cumplimineto']
+    }
   ];
 
   items = MenubarComponent.MENU_ITEMS.map(item => ({
