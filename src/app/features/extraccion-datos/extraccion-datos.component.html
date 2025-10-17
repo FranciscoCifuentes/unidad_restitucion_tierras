@@ -1,0 +1,114 @@
+<div class="p-grid p-fluid cards-row">
+	<!-- Left card: Datos extraídos de la Sentencia IA -->
+	<div class="p-col-12 p-md-6">
+		<p-card class="card">
+			<ng-template pTemplate="header">
+				<h3 class="card-title">Datos extraídos de la Sentencia IA</h3>
+			</ng-template>
+
+			<!-- Content left card -->
+			<div class="p-field p-grid">
+				<div class="p-col-fixed" style="width:36px">
+					<p-checkbox [(ngModel)]="cbIdSentencia" binary="true"></p-checkbox>
+				</div>
+				<label class="p-col">ID Sentencia</label>
+				<div class="p-col-12 p-md-8">
+					<input pInputText type="text" [value]="idSentencia" readonly />
+				</div>
+			</div>
+
+			<div class="p-field p-grid">
+				<div class="p-col-fixed" style="width:36px">
+					<p-checkbox [(ngModel)]="cbNoRadicados" binary="true"></p-checkbox>
+				</div>
+				<label class="p-col">No. Radicados</label>
+				<div class="p-col-12 p-md-8">
+					<input pInputText type="text" [value]="noRadicados" readonly />
+				</div>
+			</div>
+
+			<div class="p-field p-grid">
+				<div class="p-col-fixed" style="width:36px">
+					<p-checkbox [(ngModel)]="cbFechaSentencia" binary="true"></p-checkbox>
+				</div>
+				<label class="p-col">Fecha Sentencia</label>
+				<div class="p-col-12 p-md-8">
+					<input pInputText type="date" [value]="fechaSentencia" readonly />
+				</div>
+			</div>
+
+			<div class="p-field">
+				<label>Estado de la Sentencia</label>
+				<select pInputText [(ngModel)]="estadoSentencia">
+					<option>En procesamiento</option>
+					<option>Completado</option>
+					<option>Requiere revisión</option>
+				</select>
+			</div>
+
+			<div class="p-field sakai-note">
+				<div class="p-field-checkbox">
+					<p-checkbox [(ngModel)]="confirmoExtraccion" binary="true"></p-checkbox>
+					<label>Confirmo que los datos extraídos por la IA son correctos</label>
+				</div>
+				<div class="p-field-checkbox">
+					<p-checkbox [(ngModel)]="requiereCorreccion" binary="true"></p-checkbox>
+					<label>Requiere corrección/ajuste manual</label>
+				</div>
+				<small class="p-text-muted">Cuando actives "Requiere corrección..." podrás marcar campos para corregir y se habilitará un campo para ingresarlos el nuevo valor.</small>
+			</div>
+
+			<ng-template pTemplate="footer">
+				<!-- footer left card (vacío por ahora) -->
+			</ng-template>
+		</p-card>
+	</div>
+
+	<!-- Right card: Datos del Auto Judicial -->
+		<div class="p-col-12 p-md-6">
+			<p-card class="card">
+			<ng-template pTemplate="header">
+				<h3 class="card-title">Datos del Auto Judicial</h3>
+			</ng-template>
+
+			<div class="p-field p-grid">
+				<div class="p-col-fixed" style="width:36px">
+					<p-checkbox [(ngModel)]="cbTipoNovedad" binary="true"></p-checkbox>
+				</div>
+				<label class="p-col">Tipo de Novedad</label>
+				<div class="p-col-12 p-md-8">
+					<select pInputText [(ngModel)]="tipoNovedad">
+						<option value="">-</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="p-field p-grid">
+				<div class="p-col-fixed" style="width:36px">
+					<p-checkbox [(ngModel)]="cbDespachoJudicial" binary="true"></p-checkbox>
+				</div>
+				<label class="p-col">Despacho Judicial</label>
+				<div class="p-col-12 p-md-8">
+					<input pInputText type="text" [(ngModel)]="despachoJudicial" />
+				</div>
+			</div>
+
+			<div class="p-field p-grid">
+				<div class="p-col-fixed" style="width:36px">
+					<p-checkbox [(ngModel)]="cbFechaExpedicion" binary="true"></p-checkbox>
+				</div>
+				<label class="p-col">Fecha expedición providencia</label>
+				<div class="p-col-12 p-md-8">
+					<p-calendar [(ngModel)]="fechaExpedicionProvidencia" dateFormat="yy-mm-dd"></p-calendar>
+				</div>
+			</div>
+
+			<ng-template pTemplate="footer">
+				<div class="card-actions">
+					<button pButton type="button" label="Cancelar" class="p-button-secondary" (click)="cancelar()"></button>
+					<button pButton type="button" label="Guardar y Continuar" class="p-button-success" (click)="guardarYContinuar()"></button>
+				</div>
+			</ng-template>
+		</p-card>
+	</div>
+</div>

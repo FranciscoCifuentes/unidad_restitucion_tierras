@@ -29,6 +29,12 @@ export class MenubarComponent {
       icon: 'pi pi-briefcase',
       route: ['/vocacion-cumplimineto']
     }
+    ,
+    {
+      label: 'Extracción de datos',
+      icon: 'pi pi-database',
+      route: ['/extraccion-datos']
+    }
   ];
 
   items = MenubarComponent.MENU_ITEMS.map(item => ({

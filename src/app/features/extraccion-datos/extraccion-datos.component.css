@@ -1,0 +1,80 @@
+/* Styles para ExtraccionDatosComponent - Sakai-like visuals */
+.card, .sakai-card {
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #2b6b2b; /* verde Sakai-like */
+}
+
+.p-field {
+  margin-bottom: 0.75rem;
+}
+
+.sakai-note {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.cards-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Force equal width for the two card columns on desktop */
+.cards-row > .p-col-12.p-md-6 {
+  flex: 0 0 48%;
+  max-width: 48%;
+}
+
+/* Asegura que la tarjeta ocupe toda la altura y coloca las acciones al final */
+.card .p-grid:last-child {
+  margin-top: auto;
+}
+
+.card-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Ajuste de botones para que ocupen todo el ancho en pantallas pequeñas */
+@media (max-width: 767px) {
+  .cards-row {
+    flex-direction: column;
+  }
+  .card-actions {
+    flex-direction: column-reverse;
+  }
+  .card-actions .p-button {
+    width: 100%;
+  }
+}
+
+/* Mejor separación entre filas */
+.p-field p-checkbox {
+  margin-right: 0.5rem;
+}
+
+/* Footer buttons look */
+.p-button.p-button-success {
+  background-color: #5c9a2a; /* verde parecido a sakai */
+  border-color: #5c9a2a;
+}
+.p-button.p-button-secondary {
+  background-color: #f5f7f8;
+  color: #333;
+  border-color: #cfd8dc;
+}
