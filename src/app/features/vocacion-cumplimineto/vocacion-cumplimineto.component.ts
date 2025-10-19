@@ -5,6 +5,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FileUploadModule } from 'primeng/fileupload';
+import { LoggingService } from '../../core/services/logging.service';
 
 interface Orden {
   id: string;
@@ -27,6 +28,8 @@ export class VocacionCumpliminetoComponent {
     { id: 'ORD-002', tipo: 'Atención médica prioritaria', vocacion: false, documento: null }
   ];
 
+  constructor(private logger: LoggingService) {}
+
   onFileSelect(event: any, orden: Orden) {
     // p-fileUpload onSelect event provides an array in event.files
     const file = (event && event.files && event.files[0]) ? event.files[0] : (event?.target?.files ? event.target.files[0] : null);
@@ -35,7 +38,7 @@ export class VocacionCumpliminetoComponent {
 
   save() {
     // Persist logic would go here. For now just log the payload.
-    console.log('Guardar vocación de cumplimiento:', this.ordenes);
+    this.logger.debug('Guardar vocación de cumplimiento:', this.ordenes);
   }
 
   cancel() {

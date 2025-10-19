@@ -15,7 +15,7 @@ import { CardModule } from 'primeng/card';
   styleUrls: ['./extraccion-datos.component.css']
 })
 export class ExtraccionDatosComponent {
-  // Valores de ejemplo — reemplace con binding real si necesita
+  // Valores de ejemplo — reemplazar con binding real si es necesario
   idSentencia = '7854';
   noRadicados = '12345567789';
   fechaSentencia = '2025-07-10';
@@ -26,8 +26,8 @@ export class ExtraccionDatosComponent {
   fechaExpedicionProvidencia: Date | null = null;
 
   confirmoExtraccion = false;
-  requiereCorreccion = true;
-  // checkboxes for the left/right small selectors
+  requiereCorreccion = false;
+  // checkboxes for the left/right selectors
   cbIdSentencia = false;
   cbNoRadicados = false;
   cbFechaSentencia = false;
@@ -36,10 +36,10 @@ export class ExtraccionDatosComponent {
   cbFechaExpedicion = false;
 
   cancelar() {
-    // lógica de cancelar (temporal)
+    // lógica de cancelar
   }
 
   guardarYContinuar() {
-    // lógica de guardado (temporal)
+    // lógica de guardado
   }
 }

@@ -3,6 +3,7 @@ import { Table } from 'primeng/table';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SentenciasService } from '../../../../core/services/sentencias.service';
+import { LoggingService } from '../../../../core/services/logging.service';
 import { Sentencia, SentenciaApiResponse, DetalleErrorResponse } from '../../../../core/models/sentencia-api';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -52,7 +53,8 @@ export class SentenciasTableComponent implements OnInit {
     private sentenciasService: SentenciasService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private logger: LoggingService
   ) {
     this.form = this.fb.group({
       radicado: ['', Validators.required],
@@ -201,11 +203,12 @@ export class SentenciasTableComponent implements OnInit {
   }
 
   onDownload(sentencia: Sentencia): void {
-    console.log('Descargar', sentencia);
+  // Audit-safe logging through the injected LoggingService
+  this.logger.debug('Descargar', sentencia);
   }
 
   onManage(sentencia: Sentencia): void {
-    console.log('Gestionar', sentencia);
+    this.logger.debug('Gestionar', sentencia);
   }
 
   clear(dt: Table): void {

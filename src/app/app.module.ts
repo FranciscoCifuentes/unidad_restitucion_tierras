@@ -14,7 +14,6 @@ import { AppComponent } from './app.component';
  * SRP: Solo gestiona dependencias globales y bootstrap.
  */
 @NgModule({
-  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -22,7 +21,7 @@ import { AppComponent } from './app.component';
     RouterModule.forRoot(routes),
     SentenciasModule,
     SharedModule
-  ],
-  bootstrap: [AppComponent]
+  ]
+
 })
 export class AppModule {}

@@ -31,7 +31,6 @@ import { SentenciasTableComponent } from './components/sentencias-table/sentenci
     BadgeEstadoPipe,
     SentenciasRoutingModule
   ],
-  providers: [MessageService, ConfirmationService],
   exports: [SentenciasTableComponent]
 })
 export class SentenciasModule {}

@@ -8,6 +8,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { LoggingService } from '../../core/services/logging.service';
 
 export interface Orden {
   id: string;
@@ -30,15 +31,15 @@ export class AsignacionEntidadesComponent {
 
   onModificar(orden: Orden) {
     // Placeholder: abrir modal o navegar a la edición
-    console.log('Modificar', orden);
+    this.logger.debug('Modificar', orden);
   }
 
   onGuardar() {
-    console.log('Guardar cambios', this.ordenes);
+    this.logger.debug('Guardar cambios', this.ordenes);
   }
 
   onCancelar() {
-    console.log('Cancelar');
+    this.logger.debug('Cancelar');
   }
 
   // Edición inline de entidades
@@ -51,7 +52,7 @@ export class AsignacionEntidadesComponent {
   entities: { id_entidad: string; nombre: string }[] = [];
   filteredEntities: { id_entidad: string; nombre: string }[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private logger: LoggingService) {}
 
   ngOnInit(): void {
     this.getEntities();

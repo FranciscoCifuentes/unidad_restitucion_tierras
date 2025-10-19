@@ -17,6 +17,9 @@
 
 .p-field {
   margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .sakai-note {
@@ -64,8 +67,21 @@
 }
 
 /* Mejor separación entre filas */
-.p-field p-checkbox {
-  margin-right: 0.5rem;
+.p-field .p-checkbox {
+  margin: 0;
+  flex: 0 0 36px; /* reserve space for checkbox */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-field label.p-col {
+  flex: 0 0 160px; /* label column width */
+  margin: 0;
+}
+
+.p-field input[pInputText], .p-field select[pInputText], .p-field p-calendar {
+  flex: 1 1 auto;
 }
 
 /* Footer buttons look */

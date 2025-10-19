@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AsignacionEntidadesComponent } from './asignacion-entidades.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AsignacionEntidadesComponent', () => {
   let component: AsignacionEntidadesComponent;
@@ -8,7 +9,7 @@ describe('AsignacionEntidadesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AsignacionEntidadesComponent]
+      imports: [AsignacionEntidadesComponent, HttpClientTestingModule]
     })
     .compileComponents();
 
