@@ -93,6 +93,8 @@ ng version
    Para cambiar el dominio de la API, puedes:
    - Modificar directamente `apiDomain` en el archivo
    - Usar la variable de entorno `NG_APP_API_DOMAIN` (especialmente útil en Docker)
+   
+   **Nota de Seguridad**: En entornos de producción, siempre utiliza HTTPS en lugar de HTTP para comunicaciones seguras con la API.
 
 ## 🎮 Uso
 
@@ -203,7 +205,7 @@ Retorna la lista completa de sentencias con su estado actual.
 ```json
 [
   {
-    "radicado_providencia": "11001310300120240012300",
+    "radicado_providencia": "00000000000000000000000",
     "fecha_envio": "15/08/2025",
     "estado": "Procesado con éxito",
     "tiempo_transcurrido": "1 hora 15 minutos",
@@ -211,6 +213,8 @@ Retorna la lista completa de sentencias con su estado actual.
   }
 ]
 ```
+
+*Nota: Los números de radicado mostrados son ejemplos ficticios para propósitos de demostración.*
 
 ### Cargar Nueva Sentencia
 ```
@@ -237,7 +241,7 @@ Obtiene información detallada sobre errores de procesamiento.
 **Respuesta:**
 ```json
 {
-  "radicado_providencia": "76001400300220240045601",
+  "radicado_providencia": "00000000000000000000000",
   "estado": "Procesado con error",
   "error_timestamp": "2025-08-14T10:30:00Z",
   "codigo_error": "ERR_EXTRACTION_001",
@@ -246,6 +250,8 @@ Obtiene información detallada sobre errores de procesamiento.
   "log_tecnico": "..."
 }
 ```
+
+*Nota: Los números de radicado mostrados son ejemplos ficticios para propósitos de demostración.*
 
 ## 🎨 Estados de Sentencias
 
@@ -266,8 +272,10 @@ El sistema maneja los siguientes estados para cada sentencia:
 El proyecto está preparado para ejecutarse en contenedores Docker. Para cambiar el dominio de la API en entornos Docker, utiliza la variable de entorno:
 
 ```dockerfile
-ENV NG_APP_API_DOMAIN=http://api-produccion.dominio.com
+ENV NG_APP_API_DOMAIN=https://api-produccion.dominio.com
 ```
+
+**Nota de Seguridad**: Siempre utiliza HTTPS en entornos de producción.
 
 ## 📜 Scripts Disponibles
 
