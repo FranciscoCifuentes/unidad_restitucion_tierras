@@ -1,15 +1,15 @@
-export interface Sentencia {
-  radicado_providencia: string;
-  fecha_envio: string;
-  estado: 'No encontrado' | 'Recibido' | 'En procesamiento' | 'Procesado con éxito' | 'Procesado con error' | 'En retroalimentación' | 'Finalizada y cargada en SRTDAF';
-  tiempo_transcurrido: string;
-  acciones: string[];
-}
+import { Sentencia } from './sentencia';
 
+/**
+ * Respuesta de la API al agregar o consultar una sentencia
+ */
 export interface SentenciaApiResponse extends Sentencia {
   mensaje?: string;
 }
 
+/**
+ * Respuesta de la API al consultar el detalle de un error
+ */
 export interface DetalleErrorResponse {
   radicado_providencia: string;
   estado: string;

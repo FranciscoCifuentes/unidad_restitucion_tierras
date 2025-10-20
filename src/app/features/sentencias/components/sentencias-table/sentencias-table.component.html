@@ -1,144 +1,226 @@
 <div class="card">
-  <div class="font-semibold text-xl mb-4">Extracción de Sentencia</div>
+  <header class="font-semibold text-xl mb-4">
+    <h1>Extracción de Sentencia</h1>
+  </header>
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
-  <form [formGroup]="form" class="sentencia-form" autocomplete="off" (submit)="$event.preventDefault()">
-    <div class="sentencia-form-row">
-      <div class="sentencia-form-group">
-        <label for="radicadoInput">Radicado de la providencia</label>
-        <input id="radicadoInput" type="text" class="sentencia-input" placeholder="Ingrese el número de radicado de la providencia" formControlName="radicado" (input)="onRadicadoChange($event)" />
-        <div *ngIf="form.get('radicado')?.invalid && (form.get('radicado')?.touched || form.get('radicado')?.dirty)" class="sentencia-mensaje sentencia-mensaje-error">
-          El radicado es obligatorio.
-        </div>
-      </div>
-      <div class="sentencia-form-group">
-        <label for="fileInput">Cargar sentencia</label>
-        <input id="fileInput" type="file" class="sentencia-input-file" (change)="onFileChange($event)" />
-        <div *ngIf="form.get('archivo')?.invalid && (form.get('archivo')?.touched || form.get('archivo')?.dirty)" class="sentencia-mensaje sentencia-mensaje-error">
-          Debe seleccionar un archivo.
-        </div>
-      </div>
-      <div class="sentencia-form-group sentencia-form-btn">
-  <button type="button" class="sentencia-btn-agregar" [disabled]="agregando || form.invalid" (click)="onAgregar()" aria-label="Agregar sentencia">Agregar</button>
-      </div>
-    </div>
-    <div *ngIf="mensajeAgregar"
-         class="sentencia-mensaje"
-         [ngClass]="{
-           'sentencia-mensaje-error': mensajeAgregar === 'Debe ingresar el radicado y seleccionar un archivo.' || mensajeAgregar.startsWith('Error'),
-           'sentencia-mensaje-exito': mensajeAgregar === 'Sentencia agregada correctamente.'
-         }"
-    >
-      {{ mensajeAgregar }}
-    </div>
-  </form>
-  <p-table
-    #dt
-    [value]="sentencias"
-    dataKey="radicado_providencia"
-    [rows]="10"
-    [paginator]="true"
-    [loading]="loading"
-    [rowHover]="true"
-    [globalFilterFields]="['radicado_providencia','fecha_envio','estado','tiempo_transcurrido']"
-    responsiveLayout="scroll"
-  >
-    <ng-template pTemplate="header">
-      <tr>
-        <th style="min-width: 14rem" pSortableColumn="radicado_providencia">
-          <div class="flex justify-between items-center">
-            Radicado de la providencia
-            <p-columnFilter type="text" field="radicado_providencia" display="menu" placeholder="Buscar por radicado"></p-columnFilter>
+  
+  <section aria-label="Formulario de carga de sentencias">
+    <form [formGroup]="form" class="sentencia-form" autocomplete="off" (submit)="$event.preventDefault()">
+      <div class="sentencia-form-row">
+        <div class="sentencia-form-group">
+          <label for="radicadoInput">Radicado de la providencia</label>
+          <input 
+            id="radicadoInput" 
+            type="text" 
+            class="sentencia-input" 
+            placeholder="Ingrese el número de radicado de la providencia" 
+            formControlName="radicado" 
+            (input)="onRadicadoChange($event)"
+            aria-required="true"
+            aria-describedby="radicado-error" />
+          <div 
+            id="radicado-error"
+            *ngIf="form.get('radicado')?.invalid && (form.get('radicado')?.touched || form.get('radicado')?.dirty)" 
+            class="sentencia-mensaje sentencia-mensaje-error"
+            role="alert">
+            El radicado es obligatorio.
           </div>
-        </th>
-        <th style="min-width: 12rem" pSortableColumn="fecha_envio">
-          Fecha de envío
-        </th>
-        <th style="min-width: 10rem" pSortableColumn="estado">
-          Estado
-        </th>
-        <th style="min-width: 14rem" pSortableColumn="tiempo_transcurrido">
-          Tiempo transcurrido
-        </th>
-        <th style="min-width: 10rem">Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-sentencia>
-      <tr>
-        <td>{{ sentencia.radicado_providencia }}</td>
-        <td>{{ sentencia.fecha_envio | date:'dd/MM/yyyy' }}</td>
-        <td>
-          <span
-            class="badge"
-            [ngClass]="sentencia.estado | badgeEstado"
-          >
-            {{ sentencia.estado }}
-          </span>
-        </td>
-        <td>{{ sentencia.tiempo_transcurrido }}</td>
-        <td>
-          <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)" [attr.aria-label]="'Eliminar sentencia ' + sentencia.radicado_providencia"></button>
-          <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download" class="p-button-success p-button-sm mr-1" (click)="onDownload(sentencia)" [attr.aria-label]="'Descargar sentencia ' + sentencia.radicado_providencia"></button>
-          <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog" class="p-button-warning p-button-sm mr-1" (click)="onManage(sentencia)" [attr.aria-label]="'Gestionar sentencia ' + sentencia.radicado_providencia"></button>
-          <button *ngIf="sentencia.acciones.includes('Ver detalle')" pButton type="button" icon="pi pi-exclamation-triangle" class="p-button-info p-button-sm" (click)="onVerDetalle(sentencia)" [attr.aria-label]="'Ver detalle de error de sentencia ' + sentencia.radicado_providencia"></button>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="5">
-          <ng-container *ngIf="!error; else errorTpl">No se encontraron sentencias.</ng-container>
-          <ng-template #errorTpl>
-            <span class="text-red-500">{{ error }}</span>
-          </ng-template>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="loadingbody">
-      <tr>
-        <td colspan="5">Cargando datos de sentencias. Por favor espere.</td>
-      </tr>
-    </ng-template>
-  </p-table>
+        </div>
+        <div class="sentencia-form-group">
+          <label for="fileInput">Cargar sentencia</label>
+          <input 
+            id="fileInput" 
+            type="file" 
+            class="sentencia-input-file" 
+            (change)="onFileChange($event)"
+            aria-required="true"
+            aria-describedby="archivo-error"
+            accept=".pdf,.doc,.docx" />
+          <div 
+            id="archivo-error"
+            *ngIf="form.get('archivo')?.invalid && (form.get('archivo')?.touched || form.get('archivo')?.dirty)" 
+            class="sentencia-mensaje sentencia-mensaje-error"
+            role="alert">
+            Debe seleccionar un archivo.
+          </div>
+        </div>
+        <div class="sentencia-form-group sentencia-form-btn">
+          <button 
+            type="button" 
+            class="sentencia-btn-agregar" 
+            [disabled]="agregando || form.invalid" 
+            (click)="onAgregar()" 
+            aria-label="Agregar sentencia">
+            Agregar
+          </button>
+        </div>
+      </div>
+      <div 
+        *ngIf="mensajeAgregar"
+        class="sentencia-mensaje"
+        [ngClass]="{
+          'sentencia-mensaje-error': mensajeAgregar === MENSAJES.ERROR_VALIDACION_FORMULARIO || mensajeAgregar.startsWith('Error'),
+          'sentencia-mensaje-exito': mensajeAgregar === MENSAJES.EXITO_AGREGAR_SENTENCIA
+        }"
+        role="alert"
+        aria-live="polite">
+        {{ mensajeAgregar }}
+      </div>
+    </form>
+  </section>
+  
+  <section aria-label="Tabla de sentencias">
+    <p-table
+      #dt
+      [value]="sentencias"
+      dataKey="radicado_providencia"
+      [rows]="10"
+      [paginator]="true"
+      [loading]="loading"
+      [rowHover]="true"
+      [globalFilterFields]="['radicado_providencia','fecha_envio','estado','tiempo_transcurrido']"
+      responsiveLayout="scroll"
+      ariaLabel="Tabla de sentencias cargadas">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="min-width: 14rem" pSortableColumn="radicado_providencia">
+            <div class="flex justify-between items-center">
+              Radicado de la providencia
+              <p-columnFilter 
+                type="text" 
+                field="radicado_providencia" 
+                display="menu" 
+                placeholder="Buscar por radicado"
+                ariaLabel="Filtrar por radicado"></p-columnFilter>
+            </div>
+          </th>
+          <th style="min-width: 12rem" pSortableColumn="fecha_envio">
+            Fecha de envío
+          </th>
+          <th style="min-width: 10rem" pSortableColumn="estado">
+            Estado
+          </th>
+          <th style="min-width: 14rem" pSortableColumn="tiempo_transcurrido">
+            Tiempo transcurrido
+          </th>
+          <th style="min-width: 10rem">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-sentencia>
+        <tr>
+          <td>{{ sentencia.radicado_providencia }}</td>
+          <td>{{ sentencia.fecha_envio | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="sentencia.estado | badgeEstado"
+              role="status"
+              [attr.aria-label]="'Estado: ' + sentencia.estado">
+              {{ sentencia.estado }}
+            </span>
+          </td>
+          <td>{{ sentencia.tiempo_transcurrido }}</td>
+          <td>
+            <button 
+              *ngIf="sentencia.acciones.includes(ACCIONES.ELIMINAR)" 
+              pButton 
+              type="button" 
+              icon="pi pi-trash" 
+              class="p-button-danger p-button-sm mr-1" 
+              (click)="onDelete(sentencia)" 
+              [attr.aria-label]="'Eliminar sentencia con radicado ' + sentencia.radicado_providencia"></button>
+            <button 
+              *ngIf="sentencia.acciones.includes(ACCIONES.DESCARGAR)" 
+              pButton 
+              type="button" 
+              icon="pi pi-download" 
+              class="p-button-success p-button-sm mr-1" 
+              (click)="onDownload(sentencia)" 
+              [attr.aria-label]="'Descargar sentencia con radicado ' + sentencia.radicado_providencia"></button>
+            <button 
+              *ngIf="sentencia.acciones.includes(ACCIONES.GESTIONAR)" 
+              pButton 
+              type="button" 
+              icon="pi pi-cog" 
+              class="p-button-warning p-button-sm mr-1" 
+              (click)="onManage(sentencia)" 
+              [attr.aria-label]="'Gestionar sentencia con radicado ' + sentencia.radicado_providencia"></button>
+            <button 
+              *ngIf="sentencia.acciones.includes(ACCIONES.VER_DETALLE)" 
+              pButton 
+              type="button" 
+              icon="pi pi-exclamation-triangle" 
+              class="p-button-info p-button-sm" 
+              (click)="onVerDetalle(sentencia)" 
+              [attr.aria-label]="'Ver detalle de error de sentencia con radicado ' + sentencia.radicado_providencia"></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">
+            <ng-container *ngIf="!error; else errorTpl">{{ MENSAJES.SIN_SENTENCIAS }}</ng-container>
+            <ng-template #errorTpl>
+              <span class="text-red-500" role="alert">{{ error }}</span>
+            </ng-template>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="loadingbody">
+        <tr>
+          <td colspan="5" role="status" aria-live="polite">{{ MENSAJES.CARGANDO_DATOS }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
 </div>
 
-<p-dialog header="Detalle del error" [(visible)]="displayDetalleError" [modal]="true" [style]="{width: '60vw'}" [baseZIndex]="10000" *ngIf="detalleError">
+<p-dialog 
+  header="Detalle del error" 
+  [(visible)]="displayDetalleError" 
+  [modal]="true" 
+  [style]="{width: '60vw'}" 
+  [baseZIndex]="10000" 
+  *ngIf="detalleError"
+  role="dialog"
+  aria-labelledby="dialog-header">
   <ng-container *ngIf="detalleError; else cargandoDetalle">
     <div class="p-fluid">
       <div class="p-field">
-        <label>Radicado:</label>
-        <span>{{ detalleError.radicado_providencia }}</span>
+        <label for="detalle-radicado">Radicado:</label>
+        <span id="detalle-radicado">{{ detalleError.radicado_providencia }}</span>
       </div>
       <div class="p-field">
-        <label>Estado:</label>
-        <span>{{ detalleError.estado }}</span>
+        <label for="detalle-estado">Estado:</label>
+        <span id="detalle-estado">{{ detalleError.estado }}</span>
       </div>
       <div class="p-field">
-        <label>Fecha del error:</label>
-        <span>{{ detalleError.error_timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+        <label for="detalle-fecha">Fecha del error:</label>
+        <span id="detalle-fecha">{{ detalleError.error_timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
       <div class="p-field">
-        <label>Código de error:</label>
-        <span>{{ detalleError.codigo_error }}</span>
+        <label for="detalle-codigo">Código de error:</label>
+        <span id="detalle-codigo">{{ detalleError.codigo_error }}</span>
       </div>
       <div class="p-field">
-        <label>Mensaje:</label>
-        <span>{{ detalleError.mensaje_error }}</span>
+        <label for="detalle-mensaje">Mensaje:</label>
+        <span id="detalle-mensaje">{{ detalleError.mensaje_error }}</span>
       </div>
       <div class="p-field">
-        <label>Sugerencia:</label>
-        <span>{{ detalleError.sugerencia_solucion }}</span>
+        <label for="detalle-sugerencia">Sugerencia:</label>
+        <span id="detalle-sugerencia">{{ detalleError.sugerencia_solucion }}</span>
       </div>
       <div class="p-field">
-        <label>Log técnico:</label>
-        <pre style="white-space: pre-wrap;">{{ detalleError.log_tecnico }}</pre>
+        <label for="detalle-log">Log técnico:</label>
+        <pre id="detalle-log" style="white-space: pre-wrap;">{{ detalleError.log_tecnico }}</pre>
       </div>
     </div>
   </ng-container>
   <ng-template #cargandoDetalle>
-    <div class="p-text-center">
-      <i class="pi pi-spin pi-spinner" style="font-size: 2em"></i>
-      <p>Cargando detalle...</p>
+    <div class="p-text-center" role="status" aria-live="polite">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2em" aria-hidden="true"></i>
+      <p>{{ MENSAJES.CARGANDO_DETALLE }}</p>
     </div>
   </ng-template>
 </p-dialog>
