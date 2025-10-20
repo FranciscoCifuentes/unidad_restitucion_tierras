@@ -16,8 +16,7 @@ import { Pipe, PipeTransform } from '@angular/core';
  * - Finalizada y cargada en SRTDAF -> badge-finalizada
  */
 @Pipe({
-  name: 'badgeEstado',
-  standalone: true
+  name: 'badgeEstado'
 })
 export class BadgeEstadoPipe implements PipeTransform {
   private readonly estadoToClass: Record<string, string> = {

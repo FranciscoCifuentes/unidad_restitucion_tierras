@@ -17,7 +17,10 @@ import { BadgeEstadoPipe } from './pipes/badge-estado.pipe';
  * Contiene componentes, servicios y pipes relacionados con la gestión de sentencias judiciales
  */
 @NgModule({
-  declarations: [SentenciasTableComponent],
+  declarations: [
+    SentenciasTableComponent,
+    BadgeEstadoPipe
+  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -26,8 +29,7 @@ import { BadgeEstadoPipe } from './pipes/badge-estado.pipe';
     InputTextModule,
     DialogModule,
     ToastModule,
-    ConfirmDialogModule,
-    BadgeEstadoPipe
+    ConfirmDialogModule
   ],
   providers: [MessageService, ConfirmationService],
   exports: [SentenciasTableComponent]
