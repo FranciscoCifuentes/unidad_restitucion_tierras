@@ -14,6 +14,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 })
 export class SentenciasTableComponent implements OnInit {
   form: FormGroup;
+  autoArchivo: File | null = null;
   agregando = false;
   mensajeAgregar: string | null = null;
   displayDetalleError = false;
@@ -22,7 +23,33 @@ export class SentenciasTableComponent implements OnInit {
   sentencias: Sentencia[] = [];
   loading = false;
   error: string | null = null;
-  radicadoError: string | null = null;
+  radicadoErrors: {
+    clasificador?: string|null;
+    radicadoBase?: string|null;
+    instancia?: string|null;
+    autoClasificador?: string|null;
+    autoRadicadoBase?: string|null;
+    autoInstancia?: string|null;
+    autoPadreClasificador?: string|null;
+    autoPadreRadicadoBase?: string|null;
+    autoPadreInstancia?: string|null;
+  } = {
+    clasificador: null,
+    radicadoBase: null,
+    instancia: null,
+    autoClasificador: null,
+    autoRadicadoBase: null,
+    autoInstancia: null,
+    autoPadreClasificador: null,
+    autoPadreRadicadoBase: null,
+    autoPadreInstancia: null
+  };
+  agregarAuto = false;
+  auto: { radicado: string; radicadoPadre: string; fecha: string; archivo: File | null } = { radicado: '', radicadoPadre: '', fecha: '', archivo: null };
+  onFileChangeAuto(event: Event) {
+    const files = (event.target as HTMLInputElement).files;
+    this.auto.archivo = files && files.length > 0 ? files[0] : null;
+  }
   archivoError: string | null = null;
 
   // Mensajes y acciones centralizados
@@ -57,8 +84,20 @@ export class SentenciasTableComponent implements OnInit {
     private logger: LoggingService
   ) {
     this.form = this.fb.group({
-      radicado: ['', Validators.required],
-      archivo: [null, Validators.required]
+      clasificador: ['', Validators.required],
+      radicadoBase: ['', Validators.required],
+      instancia: ['', Validators.required],
+      archivo: [null, Validators.required],
+      agregarAuto: [false],
+      // Radicado del Auto
+      autoClasificador: [''],
+      autoRadicadoBase: [''],
+      autoInstancia: [''],
+      // Radicado de la sentencia padre
+      autoPadreClasificador: [''],
+      autoPadreRadicadoBase: [''],
+      autoPadreInstancia: [''],
+      autoFecha: ['']
     });
   }
   // (Ya existen estas propiedades, constantes y constructor arriba, así que se eliminan los duplicados)
@@ -85,16 +124,38 @@ export class SentenciasTableComponent implements OnInit {
     });
   }
 
-  onRadicadoChange(event: Event) {
-    const value = (event.target as HTMLInputElement).value.replace(/[^0-9]/g, '');
-    this.form.get('radicado')?.setValue(value);
-    this.form.get('radicado')?.markAsDirty();
-    this.radicadoError = this.validarRadicado(value);
+
+  onRadicadoInput(campo: string, event: Event) {
+    const isInstancia = campo.endsWith('Instancia') || campo === 'instancia';
+    let value = (event.target as HTMLInputElement).value.replace(/[^0-9]/g, '');
+    if (isInstancia && value.length > 2) value = value.slice(0, 2);
+    if (!isInstancia && value.length > 12 && campo.includes('Clasificador')) value = value.slice(0, 12);
+    if (!isInstancia && value.length > 9 && campo.includes('RadicadoBase')) value = value.slice(0, 9);
+    this.form.get(campo)?.setValue(value);
+    this.form.get(campo)?.markAsDirty();
+    if (this.radicadoErrors[campo as keyof typeof this.radicadoErrors]) {
+      this.radicadoErrors[campo as keyof typeof this.radicadoErrors] = null;
+    }
   }
 
-  private validarRadicado(value: string): string | null {
-    if (!value) return SentenciasTableComponent.ERROR_MSG.campoObligatorio;
-    if (value.length !== 23) return SentenciasTableComponent.ERROR_MSG.radicadoLongitud;
+  onBlurRadicado(campo: string) {
+    const value = this.form.get(campo)?.value || '';
+    this.radicadoErrors[campo as keyof typeof this.radicadoErrors] = this.validarCampoRadicado(campo, value);
+  }
+
+  // Valida cada campo individualmente
+  private validarCampoRadicado(campo: string, value: string): string | null {
+    if (!value) return 'Este campo es obligatorio.';
+    if (campo.endsWith('Clasificador') || campo === 'clasificador') {
+      if (value.length !== 12) return 'Debe tener 12 dígitos.';
+    }
+    if (campo.endsWith('RadicadoBase') || campo === 'radicadoBase') {
+      if (value.length !== 9) return 'Debe tener 9 dígitos.';
+    }
+    if (campo.endsWith('Instancia') || campo === 'instancia') {
+      if (value.length !== 2) return 'Debe tener 2 dígitos.';
+      if (!/^0[0-4]$/.test(value)) return 'Solo se permite un valor entre 00 y 04.';
+    }
     return null;
   }
   onFileChange(event: Event) {
@@ -114,19 +175,58 @@ export class SentenciasTableComponent implements OnInit {
     return null;
   }
   onAgregar() {
-    const radicado = this.form.get('radicado')?.value;
+    const clasificador = this.form.get('clasificador')?.value;
+    const radicadoBase = this.form.get('radicadoBase')?.value;
+    const instancia = this.form.get('instancia')?.value;
     const archivo = this.form.get('archivo')?.value;
-    this.radicadoError = this.validarRadicado(radicado);
+    // Validar cada campo
+    this.radicadoErrors.clasificador = this.validarCampoRadicado('clasificador', clasificador);
+    this.radicadoErrors.radicadoBase = this.validarCampoRadicado('radicadoBase', radicadoBase);
+    this.radicadoErrors.instancia = this.validarCampoRadicado('instancia', instancia);
     this.archivoError = this.validarArchivo(archivo);
-    if (this.radicadoError || this.archivoError) {
+    if (this.radicadoErrors.clasificador || this.radicadoErrors.radicadoBase || this.radicadoErrors.instancia || this.archivoError) {
       this.mensajeAgregar = SentenciasTableComponent.ERROR_MSG.agregarError;
       return;
     }
+    // Concatenar radicado completo
+    const radicado = clasificador + radicadoBase + instancia;
     this.agregando = true;
     this.mensajeAgregar = null;
     const formData = new FormData();
-    formData.append('radicado_providencia', radicado);
+  formData.append('radicado_providencia', radicado);
     formData.append('archivo', archivo);
+    // Si agregarAuto está activo, agregar los campos del auto
+    if (this.form.get('agregarAuto')?.value) {
+      // Validar los campos de radicado del auto y sentencia padre
+      this.radicadoErrors.autoClasificador = this.validarCampoRadicado('autoClasificador', this.form.get('autoClasificador')?.value);
+      this.radicadoErrors.autoRadicadoBase = this.validarCampoRadicado('autoRadicadoBase', this.form.get('autoRadicadoBase')?.value);
+      this.radicadoErrors.autoInstancia = this.validarCampoRadicado('autoInstancia', this.form.get('autoInstancia')?.value);
+      this.radicadoErrors.autoPadreClasificador = this.validarCampoRadicado('autoPadreClasificador', this.form.get('autoPadreClasificador')?.value);
+      this.radicadoErrors.autoPadreRadicadoBase = this.validarCampoRadicado('autoPadreRadicadoBase', this.form.get('autoPadreRadicadoBase')?.value);
+      this.radicadoErrors.autoPadreInstancia = this.validarCampoRadicado('autoPadreInstancia', this.form.get('autoPadreInstancia')?.value);
+      // Si hay errores, no continuar
+      if (
+        this.radicadoErrors.autoClasificador ||
+        this.radicadoErrors.autoRadicadoBase ||
+        this.radicadoErrors.autoInstancia ||
+        this.radicadoErrors.autoPadreClasificador ||
+        this.radicadoErrors.autoPadreRadicadoBase ||
+        this.radicadoErrors.autoPadreInstancia
+      ) {
+        this.mensajeAgregar = SentenciasTableComponent.ERROR_MSG.agregarError;
+        this.agregando = false;
+        return;
+      }
+      // Concatenar radicados
+      const autoRadicado = this.form.get('autoClasificador')?.value + this.form.get('autoRadicadoBase')?.value + this.form.get('autoInstancia')?.value;
+      const autoRadicadoPadre = this.form.get('autoPadreClasificador')?.value + this.form.get('autoPadreRadicadoBase')?.value + this.form.get('autoPadreInstancia')?.value;
+      formData.append('auto_radicado', autoRadicado);
+      formData.append('auto_radicado_padre', autoRadicadoPadre);
+      formData.append('auto_fecha', this.form.get('autoFecha')?.value || '');
+      if (this.autoArchivo) {
+        formData.append('auto_archivo', this.autoArchivo);
+      }
+    }
     this.sentenciasService.upload(formData).subscribe({
       next: (sentencia: SentenciaApiResponse) => {
         this.sentencias.unshift({
@@ -138,7 +238,6 @@ export class SentenciasTableComponent implements OnInit {
         const fileInputElem = document.getElementById('fileInput') as HTMLInputElement;
         if (fileInputElem) fileInputElem.value = '';
         this.mensajeAgregar = SentenciasTableComponent.ERROR_MSG.agregarSentencia;
-        this.radicadoError = null;
         this.archivoError = null;
         if (sentencia.mensaje) {
           this.messageService.add({severity: 'success', summary: 'Información', detail: sentencia.mensaje, life: 5000});

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -21,7 +21,8 @@ import { SentenciasTableComponent } from './components/sentencias-table/sentenci
   declarations: [SentenciasTableComponent],
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+  ReactiveFormsModule,
+  FormsModule,
     TableModule,
     ButtonModule,
     InputTextModule,

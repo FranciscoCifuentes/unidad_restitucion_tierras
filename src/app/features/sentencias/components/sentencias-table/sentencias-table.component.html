@@ -3,59 +3,181 @@
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
   <form [formGroup]="form" class="sentencia-form" autocomplete="off" (submit)="$event.preventDefault()">
-    <div class="sentencia-form-row">
-      <div class="sentencia-form-group">
-        <label for="radicadoInput">Radicado de la providencia</label>
-        <input id="radicadoInput" type="text" class="sentencia-input" placeholder="Ingrese el número de radicado de la providencia" formControlName="radicado" (input)="onRadicadoChange($event)" [ngClass]="{'input-error': radicadoError}" maxlength="23" autocomplete="off" inputmode="numeric" pattern="[0-9]*" />
-        <div *ngIf="radicadoError" class="sentencia-mensaje sentencia-mensaje-error">
-          <span class="sentencia-error-icon">&#33;</span>
-          <span>{{ radicadoError }}</span>
+    <ng-container *ngIf="!form.get('agregarAuto')?.value; else autoForm">
+      <div class="sentencia-form-row sentencia-form-row-main">
+        <div class="sentencia-form-radicado-group">
+          <div class="sentencia-form-radicado-item">
+            <label for="clasificadorInput">Clasificador</label>
+            <input id="clasificadorInput" type="text" class="sentencia-input sentencia-input-center"
+              formControlName="clasificador" maxlength="12" autocomplete="off" inputmode="numeric" pattern="[0-9]*"
+              (blur)="onBlurRadicado('clasificador')" (input)="onRadicadoInput('clasificador', $event)" />
+            <span *ngIf="radicadoErrors.clasificador" class="sentencia-mensaje sentencia-mensaje-error"
+              style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+              <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.clasificador }}
+            </span>
+          </div>
+          <div class="sentencia-form-radicado-item">
+            <label for="radicadoBaseInput">Radicado base</label>
+            <input id="radicadoBaseInput" type="text" class="sentencia-input sentencia-input-center"
+              formControlName="radicadoBase" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*"
+              (blur)="onBlurRadicado('radicadoBase')" (input)="onRadicadoInput('radicadoBase', $event)" />
+            <span *ngIf="radicadoErrors.radicadoBase" class="sentencia-mensaje sentencia-mensaje-error"
+              style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+              <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.radicadoBase }}
+            </span>
+          </div>
+          <div class="sentencia-form-radicado-item">
+            <label for="instanciaInput">Instancia</label>
+            <input id="instanciaInput" type="number" class="sentencia-input sentencia-input-center"
+              formControlName="instancia" min="0" max="4" maxlength="2" autocomplete="off" inputmode="numeric"
+              (blur)="onBlurRadicado('instancia')" (input)="onRadicadoInput('instancia', $event)" />
+            <span *ngIf="radicadoErrors.instancia" class="sentencia-mensaje sentencia-mensaje-error"
+              style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+              <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.instancia }}
+            </span>
+          </div>
+        </div>
+        <div class="sentencia-form-file-group">
+          <div class="sentencia-form-file-item">
+            <label for="fileInput" style="margin-bottom: 0.2rem;">Cargar sentencia</label>
+            <input id="fileInput" type="file" class="sentencia-input-file" (change)="onFileChange($event)"
+              accept="application/pdf" />
+            <div *ngIf="archivoError" class="sentencia-mensaje sentencia-mensaje-error">
+              <span class="sentencia-error-icon">&#33;</span>
+              <span>{{ archivoError }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="sentencia-form-checkbox">
+          <input type="checkbox" id="agregarAutoCheck" formControlName="agregarAuto" style="margin-right: 0.5rem;" />
+          <label for="agregarAutoCheck" style="margin-bottom: 0;">Agregar Auto</label>
+        </div>
+        <div class="sentencia-form-btn">
+          <button type="button" class="sentencia-btn-agregar" [disabled]="agregando || form.invalid"
+            (click)="onAgregar()" aria-label="Agregar sentencia" style="min-width: 110px;">Agregar</button>
         </div>
       </div>
-      <div class="sentencia-form-group">
-        <label for="fileInput">Cargar sentencia</label>
-        <input id="fileInput" type="file" class="sentencia-input-file" (change)="onFileChange($event)" accept="application/pdf" />
-        <div *ngIf="archivoError" class="sentencia-mensaje sentencia-mensaje-error">
-          <span class="sentencia-error-icon">&#33;</span>
-          <span>{{ archivoError }}</span>
+    </ng-container>
+    <ng-template #autoForm>
+      <div class="sentencia-form-row sentencia-form-row-auto">
+        <!-- Primera fila: Inputs de radicado (auto y padre) -->
+        <div class="sentencia-form-auto-radicados">
+          <!-- Grupo: Radicado del Auto -->
+          <div class="sentencia-form-auto-group">
+            <label style="font-weight: 600; margin-bottom: 0.5rem;">Radicado del Auto</label>
+            <div class="sentencia-form-auto-items">
+              <div class="sentencia-form-auto-item">
+                <input type="text" class="sentencia-input sentencia-input-center" formControlName="autoClasificador"
+                  maxlength="12" autocomplete="off" inputmode="numeric" pattern="[0-9]*" placeholder="Clasificador"
+                  (blur)="onBlurRadicado('autoClasificador')" (input)="onRadicadoInput('autoClasificador', $event)" />
+                <span *ngIf="radicadoErrors.autoClasificador" class="sentencia-mensaje sentencia-mensaje-error"
+                  style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+                  <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.autoClasificador }}
+                </span>
+              </div>
+              <div class="sentencia-form-auto-item">
+                <input type="text" class="sentencia-input sentencia-input-center" formControlName="autoRadicadoBase"
+                  maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*" placeholder="Radicado base"
+                  (blur)="onBlurRadicado('autoRadicadoBase')" (input)="onRadicadoInput('autoRadicadoBase', $event)" />
+                <span *ngIf="radicadoErrors.autoRadicadoBase" class="sentencia-mensaje sentencia-mensaje-error"
+                  style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+                  <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.autoRadicadoBase }}
+                </span>
+              </div>
+              <div class="sentencia-form-auto-item">
+                <input type="number" class="sentencia-input sentencia-input-center" formControlName="autoInstancia"
+                  min="0" max="4" maxlength="2" autocomplete="off" inputmode="numeric" placeholder="Instancia"
+                  (blur)="onBlurRadicado('autoInstancia')" (input)="onRadicadoInput('autoInstancia', $event)" />
+                <span *ngIf="radicadoErrors.autoInstancia" class="sentencia-mensaje sentencia-mensaje-error"
+                  style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+                  <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.autoInstancia }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- Grupo: Radicado de la sentencia padre -->
+          <div class="sentencia-form-auto-group">
+            <label style="font-weight: 600; margin-bottom: 0.5rem;">Radicado de la sentencia padre</label>
+            <div class="sentencia-form-auto-items">
+              <div class="sentencia-form-auto-item">
+                <input type="text" class="sentencia-input sentencia-input-center"
+                  formControlName="autoPadreClasificador" maxlength="12" autocomplete="off" inputmode="numeric"
+                  pattern="[0-9]*" placeholder="Clasificador" (blur)="onBlurRadicado('autoPadreClasificador')"
+                  (input)="onRadicadoInput('autoPadreClasificador', $event)" />
+                <span *ngIf="radicadoErrors.autoPadreClasificador" class="sentencia-mensaje sentencia-mensaje-error"
+                  style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+                  <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.autoPadreClasificador }}
+                </span>
+              </div>
+              <div class="sentencia-form-auto-item">
+                <input type="text" class="sentencia-input sentencia-input-center"
+                  formControlName="autoPadreRadicadoBase" maxlength="9" autocomplete="off" inputmode="numeric"
+                  pattern="[0-9]*" placeholder="Radicado base" (blur)="onBlurRadicado('autoPadreRadicadoBase')"
+                  (input)="onRadicadoInput('autoPadreRadicadoBase', $event)" />
+                <span *ngIf="radicadoErrors.autoPadreRadicadoBase" class="sentencia-mensaje sentencia-mensaje-error"
+                  style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+                  <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.autoPadreRadicadoBase }}
+                </span>
+              </div>
+              <div class="sentencia-form-auto-item">
+                <input type="number" class="sentencia-input sentencia-input-center" formControlName="autoPadreInstancia"
+                  min="0" max="4" maxlength="2" autocomplete="off" inputmode="numeric" placeholder="Instancia"
+                  (blur)="onBlurRadicado('autoPadreInstancia')"
+                  (input)="onRadicadoInput('autoPadreInstancia', $event)" />
+                <span *ngIf="radicadoErrors.autoPadreInstancia" class="sentencia-mensaje sentencia-mensaje-error"
+                  style="font-size: 0.85em; color: #d32f2f; margin-top: 2px;">
+                  <span class="sentencia-error-icon">&#33;</span> {{ radicadoErrors.autoPadreInstancia }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Segunda fila: Fecha, archivo, checkbox y botón -->
+        <div class="sentencia-form-auto-bottom">
+          <div class="sentencia-form-auto-bottom-item">
+            <label for="fechaAutoInput">Fecha auto</label>
+            <input id="fechaAutoInput" type="date" class="sentencia-input" formControlName="autoFecha"
+              style="width: 100%;" />
+          </div>
+          <div class="sentencia-form-auto-bottom-item">
+            <label for="archivoAutoInput">Cargar auto</label>
+            <input id="archivoAutoInput" type="file" class="sentencia-input-file" (change)="onFileChangeAuto($event)"
+              accept="application/pdf" style="width: 100%;" />
+          </div>
+          <div class="sentencia-form-checkbox">
+            <input type="checkbox" id="agregarAutoCheck" formControlName="agregarAuto" style="margin-right: 0.5rem;" />
+            <label for="agregarAutoCheck" style="margin-bottom: 0;">Agregar Auto</label>
+          </div>
+          <div class="sentencia-form-btn">
+            <button type="button" class="sentencia-btn-agregar" [disabled]="agregando || form.invalid"
+              (click)="onAgregar()" aria-label="Agregar sentencia" style="min-width: 110px;">Agregar</button>
+          </div>
         </div>
       </div>
-      <div class="sentencia-form-group sentencia-form-btn">
-  <button type="button" class="sentencia-btn-agregar" [disabled]="agregando || form.invalid" (click)="onAgregar()" aria-label="Agregar sentencia">Agregar</button>
-      </div>
-    </div>
-    <div *ngIf="mensajeAgregar"
-         class="sentencia-mensaje"
-         [ngClass]="{
+    </ng-template>
+    <div *ngIf="mensajeAgregar" class="sentencia-mensaje" [ngClass]="{
            'sentencia-mensaje-error': mensajeAgregar === 'Debe ingresar el radicado y seleccionar un archivo.' || mensajeAgregar.startsWith('Error'),
            'sentencia-mensaje-exito': mensajeAgregar === 'Sentencia agregada correctamente.'
-         }"
-    >
+         }">
       {{ mensajeAgregar }}
     </div>
   </form>
-  <p-table
-    #dt
-    [value]="sentencias"
-    dataKey="radicado_providencia"
-    [rows]="7"
-    [paginator]="true"
-    [scrollable]="true"
-    [scrollHeight]="'calc(-360px + 100vh)'"
-    styleClass="mt-4"
-    class="mt-4 p-component p-datatable p-datatable-scrollable"
-    [loading]="loading"
-    [rowHover]="true"
+  <p-table #dt [value]="sentencias" dataKey="radicado_providencia" [rows]="7" [paginator]="true" [scrollable]="true"
+    [scrollHeight]="'calc(-360px + 100vh)'" styleClass="mt-4"
+    class="mt-4 p-component p-datatable p-datatable-scrollable" [loading]="loading" [rowHover]="true"
     [globalFilterFields]="['radicado_providencia','fecha_envio','estado','tiempo_transcurrido']"
-    responsiveLayout="scroll"
-  >
+    responsiveLayout="scroll">
     <ng-template pTemplate="header">
       <tr>
         <th style="min-width: 14rem" pSortableColumn="radicado_providencia">
           <div class="flex justify-between items-center">
-            <p-columnFilter type="text" field="radicado_providencia" display="menu" placeholder="Buscar por radicado"></p-columnFilter>
+            <p-columnFilter type="text" field="radicado_providencia" display="menu"
+              placeholder="Buscar por radicado"></p-columnFilter>
             Radicado de la providencia
           </div>
+        </th>
+        <th style="min-width: 12rem">
+          Tipo de Providencia
         </th>
         <th style="min-width: 12rem" pSortableColumn="fecha_envio">
           Fecha de envío
@@ -67,12 +189,13 @@
           Tiempo transcurrido
         </th>
         <th style="min-width: 10rem">Acciones</th>
+        <th style="min-width: 10rem">Autor</th>
       </tr>
-    <!-- ...existing header code... -->
     </ng-template>
     <ng-template pTemplate="body" let-sentencia>
       <tr>
         <td>{{ sentencia.radicado_providencia }}</td>
+        <td>sentencia</td>
         <td>{{ parseFecha(sentencia.fecha_envio) | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>
           <span class="badge" [ngClass]="sentencia.estado | badgeEstado">
@@ -81,11 +204,20 @@
         </td>
         <td>{{ sentencia.tiempo_transcurrido }}</td>
         <td>
-          <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download" class="p-button-success p-button-sm mr-1" (click)="onDownload(sentencia)" [attr.aria-label]="'Descargar sentencia ' + sentencia.radicado_providencia"></button>
-          <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)" [attr.aria-label]="'Eliminar sentencia ' + sentencia.radicado_providencia"></button>
-          <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog" class="p-button-warning p-button-sm mr-1" (click)="onManage(sentencia)" [attr.aria-label]="'Gestionar sentencia ' + sentencia.radicado_providencia"></button>
-          <button *ngIf="sentencia.acciones.includes('Ver detalle')" pButton type="button" icon="pi pi-exclamation-triangle" class="p-button-info p-button-sm" (click)="onVerDetalle(sentencia)" [attr.aria-label]="'Ver detalle de error de sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Descargar')" pButton type="button" icon="pi pi-download"
+            class="p-button-success p-button-sm mr-1" (click)="onDownload(sentencia)"
+            [attr.aria-label]="'Descargar sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Eliminar')" pButton type="button" icon="pi pi-trash"
+            class="p-button-danger p-button-sm mr-1" (click)="onDelete(sentencia)"
+            [attr.aria-label]="'Eliminar sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Gestionar')" pButton type="button" icon="pi pi-cog"
+            class="p-button-warning p-button-sm mr-1" (click)="onManage(sentencia)"
+            [attr.aria-label]="'Gestionar sentencia ' + sentencia.radicado_providencia"></button>
+          <button *ngIf="sentencia.acciones.includes('Ver detalle')" pButton type="button"
+            icon="pi pi-exclamation-triangle" class="p-button-info p-button-sm" (click)="onVerDetalle(sentencia)"
+            [attr.aria-label]="'Ver detalle de error de sentencia ' + sentencia.radicado_providencia"></button>
         </td>
+        <td>Usuario de Prueba</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
@@ -106,7 +238,8 @@
   </p-table>
 </div>
 
-<p-dialog header="Detalle del error" [(visible)]="displayDetalleError" [modal]="true" [style]="{width: '60vw'}" [baseZIndex]="10000" *ngIf="detalleError">
+<p-dialog header="Detalle del error" [(visible)]="displayDetalleError" [modal]="true" [style]="{width: '60vw'}"
+  [baseZIndex]="10000" *ngIf="detalleError">
   <ng-container *ngIf="detalleError; else cargandoDetalle">
     <div class="p-fluid">
       <div class="p-field">
@@ -119,7 +252,7 @@
       </div>
       <div class="p-field">
         <label>Fecha del error: </label>
-  <span>{{ parseFecha(detalleError.error_timestamp) | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span>{{ parseFecha(detalleError.error_timestamp) | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
       <div class="p-field">
         <label>Código de error: </label>
