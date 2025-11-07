@@ -16,24 +16,27 @@ export class MenubarComponent {
     {
       label: 'Sentencia',
       icon: 'pi pi-file',
-  route: ['/sentencias/listado']
+      route: ['/sentencias/listado']
     },
     {
       label: 'Asignación de entidades',
       icon: 'pi pi-users',
       route: ['/asignacion-entidades']
-    }
-    ,
+    },
     {
       label: 'Vocación de cumplimiento',
       icon: 'pi pi-briefcase',
       route: ['/vocacion-cumplimineto']
-    }
-    ,
+    },
     {
       label: 'Extracción de datos',
       icon: 'pi pi-database',
       route: ['/extraccion-datos']
+    },
+    {
+      label: 'Listado de Providencias',
+      icon: 'pi pi-list',
+      route: ['/listado-providencias']
     }
   ];
 

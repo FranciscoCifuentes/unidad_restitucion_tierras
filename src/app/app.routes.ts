@@ -24,6 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/asignacion-entidades/asignacion-entidades.component').then(m => m.AsignacionEntidadesComponent)
   },
   {
+    path: 'listado-providencias',
+    loadComponent: () => import('./features/listado-providencias/listado-providencias.component').then(m => m.ListadoProvidenciasComponent)
+  },
+  {
     path: 'extraccion-datos',
     loadComponent: () => import('./features/extraccion-datos/extraccion-datos.component').then(m => m.ExtraccionDatosComponent)
   },

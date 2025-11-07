@@ -1,0 +1,18 @@
+<p-table [value]="providencias" styleClass="p-datatable-sm">
+	<ng-template pTemplate="header">
+		<tr>
+			<th>Número de radicado de la providencia</th>
+			<th>Tipo de providencia</th>
+			<th>Acciones</th>
+		</tr>
+	</ng-template>
+	<ng-template pTemplate="body" let-row>
+		<tr>
+			<td>{{ row.numero }}</td>
+			<td>{{ row.tipo }}</td>
+			<td>
+				<button pButton type="button" label="Gestionar" class="p-button-sm p-button-primary"></button>
+			</td>
+		</tr>
+	</ng-template>
+</p-table>
